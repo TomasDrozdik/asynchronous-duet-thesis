@@ -1,11 +1,34 @@
-\chapter{Results}
+\chapter{Overview of Results Processing}
 \label{chap:results}
 
-Address each statistical method.
-Evaluate on A/A and A/B runs with known regressions.
+Essentially: describe data manipulation and statistics in the analysis notebooks.
 
-Address each RQ.
 
-Add some nice plots.
+\section{Data filtering}
 
-Put full results to Appendix.
+\begin{description}
+    \item[Outliers] how to deal with outliers
+    \item[Warmup] how to determine warmup time, in particullar for Java benchmarks
+    \item[Windsorization]
+\end{description}
+
+
+\section{Pre-processing}
+
+Processing results of benchmarks into standardized format - CSV for further analysis.
+
+How and what metrics does the harness gather?
+\begin{enumerate}
+    \item Absolute iteration start-end time
+    \item Overlap
+    \item Weighted Overlap
+    \item Other...
+\end{enumerate}
+
+
+\section{Varience analysis}
+
+Address each used statistical method.
+Bootstrapping, Confidence intervals and tests.
+
+Describe utilization of A/A runs and A/B runs on known regressions.

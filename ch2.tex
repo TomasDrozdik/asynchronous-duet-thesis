@@ -1,77 +1,48 @@
-\chapter{Asynchronous Duet}
+\chapter{Duet benchmarking}
 \label{chap:duet}
 
-\section{Duet}
+GOAL: Determine if new version of software introduced a performance regression based on software benchmarks.
 
-GOAL: Determine if new version of software introduced a performance regression.
+
+\section{Software Benchmarks}
+
+How are benchmarks structured?
+
+Benchmark stages: setup, main loop, verify, teardown.
+
+What are the scores/metrics that we obtain from selected benchmarks? - absolute time.
+
+Some benchmarks output other "final number" metrics - possibly mention how to include them.
+
+
+\section{Duet benchmark}
+
+Describe Synchronous Duet benchmarking - \citet{bulej2020duet}.
 
 What are A/A and A/B runs?
 
-\section{Harness}
 
-Describe asynchronous duet harness \footnote{\url{https://github.com/TomasDrozdik/asynchronous-duet}}.
+Why it makes sense to relax the synchronous iteration assumption?
+
+
+\section{Asynchronous duet}
 
 \begin{enumerate}
 	\item Basics - run 2 dockers in parallel, copy results to host, process results
 	\item Implications of using Docker:
-	\begin{enumerate}
-		\item running in VM / host
-		\item resource sharing and scheduling fairness
-		\item resource monitoring
-	\end{enumerate}
+	      \begin{enumerate}
+		      \item running in VM / host
+		      \item resource sharing and scheduling fairness - Completely Fair Scheduler
+		      \item resource monitoring
+	      \end{enumerate}
 \end{enumerate}
 
-Processing results of benchmarks into standardized format - csv for further analysis.
 
-\subsection{Metics gathering}
+\section{Research questions}
 
-What metrics does the harness gather?
-
-\subsection{Run Asynchronous Duet}
-
-Brief intor to usage of the \lstinline{duetbench.py} Example of configuration, usage and results processing.
-Refer to github docs \xxx{ref} for full user documentation.
-
-
-\section{Selected benchmarks}
-
-\begin{enumerate}
-	\item Renaissance suite
-	\item ScalaBench/DeCappo suite
-	\item some non JVM bench suite - CoreMark / SpecCPU
-\end{enumerate}
-
-\subsection{Benchmark scores}
-
-What are the scores/metrics that we obtain from selected benchmarks?
-
-\subsection{How are benchmarks examined}
-
-Benchmark profiling?
-
-Description of what they do. Either reference them and describe few that we will pick later.
-
-Metrics:
-\begin{enumerate}
-	\item CPU - user/sys, pipeline utilization
-	\item Memory 
-	\item Interractions with FS
-	\item Rate of parallelism, lock contention
-	\item JVM specific stats
-	\begin{enumerate}
-		\item TODO
-	\end{enumerate}
-\end{enumerate}
-
-\subsection{Categorizing benchmarks}
-\label{sec:categorizing}
-
-Based on examination above put benchmarks into categories.
-Idea is that benchmarks from similar category should exibit similar varience i.e. asynchronous-duet should be more viable for some categories than others.
-
-Pick some clear representatives for each category as boundaries won't be strict.
-
-Categories:
-\begin{enumerate}
-	\item Name - representatives
-\end{enumerate}
+\begin{description}
+	\item[RQ1] What is the variance of asynchronous-duet compared to synchronous duet and sequential execution?
+	\item[RQ2] How does choice of environment affect the variance? - \citet{laaber2019software}
+	\item[RQ3] What are the effects of duet benchmarking on run time and costs?
+	\item[RQ4] What categories of benchmarks and statistical methods, are viable for asynchronous-duet method. (stretch goal?)
+\end{description}

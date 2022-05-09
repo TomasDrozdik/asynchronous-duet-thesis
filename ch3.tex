@@ -1,47 +1,23 @@
-\chapter{Performance Variance Analysis}
-\label{chap:analysis}
+\chapter{Implementation}
 
-\section{Methodology}
-
-Metrics of interest:
-
-\begin{enumerate}
-  \item Benchmark Score
-  \item Overlap
-  \item Weighted Overlap
-\end{enumerate}
-
-Postulate research questions:
-
-\begin{description}
-  \item[RQ1] What statistical method works best?
-  \item[RQ2] What is the variance of asynchronous-duet compared to synchronous duet and sequential execution?
-  \item[RQ3] What categories of benchmarks, from \cref{sec:categorizing}, are viable for asynchronous-duet method.
-  \item[RQ4] How does choice of environment affect the variance? - \citet{laaber2019software}
-\end{description}
+Describe asynchronous duet harness \footnote{\url{https://github.com/TomasDrozdik/asynchronous-duet}}.
 
 
-\subsection{Evaluating variance}
+\section{Asynchronous duet method}
 
-A/A runs and A/B runs
+Brief intor to usage of the \lstinline{duetbench.py}.
 
-Data pre-processing:
+What is the algorithm?
 
-\begin{description}
-  \item[Outliers] how to deal with outliers
-  \item[Warmup] how to determine warmup time, in particullar for Java benchmarks
-\end{description}
+Example of configuration and usage.
 
-Bootstrapping.
-
-Hypothesis testing.
-\begin{enumerate}
-  \item Pair test
-\end{enumerate}
+Refer to docs \xxx{ref} for full user documentation.
 
 
-\section{Measurements}
+\section{Other benchmarking methods}
 
-Describe the environment, setup, repetitions, and other config.
+Describe that in order to make comparisons harness supports sequential runs as well as synchronous duets (just need the right docker image).
 
-\subsection{Benchmark with known regressions}
+\subsection{Sequential runs}
+
+\subsection{Synchronous duet runs}
