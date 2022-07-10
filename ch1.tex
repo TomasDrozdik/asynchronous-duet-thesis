@@ -2,79 +2,79 @@
 \label{chap:background}
 
 % Software measurement for performance comparison
-Measurement experimets are core part of performance comparison activities.
-Fast, accurate, and accessible  performance comparison method can prevent introduction of performance regressions during software development process.
-More so in current age of agile software development where new software versions are released on monthly or even weekly basis.
+Measurement experiments are a core part of performance comparison activities.
+A fast, accurate, and accessible performance comparison method can prevent the introduction of performance regressions during the software development process.
+More so in the current age of agile software development where new software versions are released on a monthly or even weekly basis.
 
-Traditional method of performance measuremnt relies on dedicated bare metal hardware with carefully setup isolated environment that tries to prevent measurement noise. \xxx{cite}
-Even in such idealy crafted conditions multiple measurements are necessary to deal with the inherent variability introduced by the code running platform, such as just-in-time compilation, garbage collection, memory mapping, and CPU frequency scaling.
-Benchmark code itself can have its own share of non-determinism that contributes to overall variability of the measurements.
+The traditional method of performance measurement relies on dedicated bare-metal hardware with a carefully set up isolated environment that tries to prevent measurement noise. \xxx{cite}
+Even in such ideally crafted conditions, multiple measurements are necessary to deal with the inherent variability introduced by the code running platform, such as just-in-time compilation, garbage collection, memory mapping, and CPU frequency scaling.
+Benchmark code itself can have its share of non-determinism that contributes to the overall variability of the measurements.
 
 % Introduce benchmarks
 Benchmark harness executes benchmark code in multiple iterations and then presents score --- time in nanoseconds per each iteration.
-When a benchmark is a small piece of code, also refered to as performance unit tests by~\citet{horky2015unit}, it is usually written in some microbenchmark framework.
-Microbenchmark execution in public cloud has been thoroughly examined by~\citet{laaber2019software}.
-If the benchmark code gets bigger it is usually refered to as application benchmarks.
+When a benchmark is a small piece of code, also referred to as performance unit tests by~\citet{horky2015unit}, it is usually written in some microbenchmark framework.
+Microbenchmark execution in a public cloud has been thoroughly examined by~\citet{laaber2019software}.
+If the benchmark code gets bigger it is usually referred to as application benchmarks.
 
 % Introduce benchmark suites
-Benchmarks do not have sole purpose of measuring performance of an application, inversely they provide a way to measure the capabilities of some hardware.
-For this reason there are many benchmark suites that aggregate many application workloads, put them under single harness and simplify the performance evaluation process.
+Benchmarks do not have the sole purpose of measuring the performance of an application, inversely they provide a way to measure the capabilities of some hardware.
+For this reason, many benchmark suites aggregate many application workloads, put them under a single harness, and simplify the performance evaluation process.
 Examples of such suites are from Standard Performance Evaluation Corporation (SPEC) SPECcpu \footnote{SPEC CPU® 2017 \url{https://www.spec.org/cpu2017/}} and SPECjbb \footnote{SPECjbb® 2015 \url{https://www.spec.org/jbb2015/}} other standalone suites used in this thesis are Renaissance suite~\cite{prokopec2019renaissance}, Dacapo \footnote{DaCapo Benchmarks \url{https://dacapo-bench.org/}}, and Scalabench \footnote{Scala Benchmarking Project \url{https://www.scalabench.org/}}.
-All above mentioned suites are Java based with the exception of SPECcpu that has benchmarks written in C, C++, and Fortran and hence is natively compiled.
-Apart from testing hardware performance, benchmark suites are good candidates for research in performance measurement methods as they strive to provide wide range of real-world representative workloads.
+All above-mentioned suites are Java-based except for SPECcpu which has benchmarks written in C, C++, and Fortran and hence is natively compiled.
+Apart from testing hardware performance, benchmark suites are good candidates for research in performance measurement methods as they strive to provide a wide range of real-world representative workloads.
 
-% Reason about long execution time and attactiveness of cloud approach
-Requirement for multiple repetitions causes an inherent trade-off between accuracy and execution time.
-Execution of a benchmark suite for some software project version, with the goal of identifying newly introduced performance regression, can take an overwhelming 3000 machine hours per day as analyzed by~\citet{bulej2020duet} on an open source GraalVM project~\footnote{Oracle. GraalVM repository at GitHub \url{https://github.com/oracle/graal}}.
+% Reason about long execution time and attractiveness of the cloud approach
+The requirement for multiple repetitions causes an inherent trade-off between accuracy and execution time.
+Execution of a benchmark suite for some software project version, to identify newly introduced performance regression, can take an overwhelming 3000 machine hours per day as analyzed by~\citet{bulej2020duet} on an open-source GraalVM project~\footnote{Oracle. GraalVM repository at GitHub \url{https://github.com/oracle/graal}}.
 By then a new version could have come around.
-This trade-off between measurement execution times and ammount of tested code change can be addressed from multiple angles.
-One is to reduce the ammount of code to be tested by identification of commits that might introduce performance regresssion~\citet{oliveira2017perphecy}.
+This trade-off between measurement execution times and the amount of tested code change can be addressed from multiple angles.
+One is to reduce the amount of code to be tested by identification of commits that might introduce performance regresssion~\citet{oliveira2017perphecy}.
 Other is to reduce the execution time by measurement parallelization.
 \xxx{Can these be combined?}
-However, maintaining multiple dedicated machines is difficult and costly \xxx{cite} and that is why much reasearch over the past decade~\cite{leitner2016patterns, laaber2019software, abedi2017conducting} has focused on offloading performance measurements to the cloud.
+However, maintaining multiple dedicated machines is difficult and costly \xxx{cite} and that is why much research over the past decade~\cite{leitner2016patterns, laaber2019software, abedi2017conducting} has focused on offloading performance measurements to the cloud.
 
 % Describe the nature of benchmarking in the cloud
-Cloud offers practically infinite hardware scaling capabilities with on demand access and pay-for-what-you-use principle.
+Cloud offers practically infinite hardware scaling capabilities with on-demand access and a pay-for-what-you-use principle.
 That makes it a tempting platform for fast and accessible performance measurements.
 Cloud offers large scale of options to run your code on from bare metal offerings \footnote{AWS Outposts \url{https://aws.amazon.com/outposts/}} to running small pieces of code \footnote{AWS Lambda \url{https://aws.amazon.com/lambda/}}.
-Most commonly examined and accessible method is an Infrastructure-as-a-Service (IaaS) cloud offering where computing resources are acquired and released as a service.
+The most commonly examined and accessible method is an Infrastructure-as-a-Service (IaaS) cloud offering where computing resources are acquired and released as a service.
 
 IaaS is typically in form of virtual machines or containers with attached virtual disks.
-These are referred to as instances and they come with different configuration options such as number of virtual CPUs, size of memory, network throughput, and virtual disk.
-This gives practitioners some control over what hardware and software platform is used to run their code compared to higher level offerings such as Platform-as-a-Service (PaaS) and Software-as-a-Service (SaaS).
+These are referred to as instances and they come with different configuration options such as a number of virtual CPUs, size of memory, network throughput, and virtual disk.
+This gives practitioners some control over what hardware and software platform is used to run their code compared to higher-level offerings such as Platform-as-a-Service (PaaS) and Software-as-a-Service (SaaS).
 
 % Performance stability in the cloud -~\citet{laaber2019software}.
-Studies such as~\citet{leitner2016patterns} and~\citet{laaber2019software} summarizes viability of measuring software performance on IaaS offerings from different providers.
-They point out that measuring software performance on public cloud is very much a moving target with providers constantly changing their offerings, hardware, and processes.
-Common concern is that given instance type may not run on the same type of hardware and that the same physical hardware might host multiple colocated instances.
-Hardware heterogenity, shared and virtualized infrastructure further amplificates the variability of performance measurements in the cloud environment~\cite{leitner2016patterns} even to the point that using state of the art statistical methods and performance measurements practitioners might not be able to detect $1000\%$ slowdown of some measured software as shown by~\citet{laaber2019software}.
+Studies such as~\citet{leitner2016patterns} and~\citet{laaber2019software} summarize the viability of measuring software performance on IaaS offerings from different providers.
+They point out that measuring software performance on the public cloud is very much a moving target with providers constantly changing their offerings, hardware, and processes.
+A common concern is that a given instance type may not run on the same type of hardware and that the same physical hardware might host multiple colocated instances.
+Hardware heterogeneity, shared and virtualized infrastructure further amplifies the variability of performance measurements in the cloud environment~\cite{leitner2016patterns} even to the point that using state-of-the-art statistical methods and performance measurements practitioners might not be able to detect $1000\%$ slowdown of some measured software as shown by~\citet{laaber2019software}.
 
-% Introduce statistical methods later on, mention repeatability, cite do we teach useful statistics?
-With many repetitions and variability across the results it is necessary to carefully process the results and use statistical methods to get an answer to the question if a code change introduced a new performance regression.
-Use of statistical methods have been extensively studied in~\citet{bulej2017stat} and further verified in~\citet{laaber2019software} specifically in the cloud context.
-To quantify variability of distribution of results from a benchmark~\citet{laaber2019software} use coefficient of variance, also called mean standard deviation.
-To compare results of two software versions~\citet{bulej2017stat} use both method of overlapping confidence intervals computed by bootstap procedure and hypothesis testing with Wilcoxon rank-sum test and its variation Mann-Whiteney U-test as well as Welch's t-test.
-\citet{bulej2017stat} also raise concerns about validity of these methods when used for perforamnce measurement data.
+% Introduce statistical methods, later on, mention repeatability, cite do we teach useful statistics?
+With many repetitions and variability across the results, it is necessary to carefully process the results and use statistical methods to get an answer to find out if a code change introduces a new performance regression.
+The use of statistical methods has been extensively studied in~\citet{bulej2017stat} and further verified in~\citet{laaber2019software} specifically in the cloud context.
+To quantify the variability of the distribution of results from a benchmark~\citet{laaber2019software} use coefficient of variance, also called mean standard deviation.
+To compare results of two software versions~\citet{bulej2017stat} use both methods of overlapping confidence intervals computed by bootstrap procedure and hypothesis testing with Wilcoxon rank-sum test and its variation Mann-Whiteney U-test as well as Welch's t-test.
+\citet{bulej2017stat} also raise concerns about the validity of these methods when used for performance measurement data.
 Concerns stem from the fact that performance measurements don't satisfy many common assumptions that statistical methods make such as random independent and identicaly distributed samples and asymptotic normality of the data.
-Moreover, performance data also tends to exhibit long range dependencies between samples, have unknown distrubutions with long long tails and are not stationary in generall which further complicate statistical analysis~\cite{bulej2017stat}.
+Moreover, performance data also tend to exhibit long-range dependencies between samples, have unknown distributions with long long tails, and are not stationary in general which further complicates statistical analysis~\cite{bulej2017stat}.
 So far there does not seem to be any "silver bullet" statistical method that would be a good fit for performance data and thus these techniques need to be used with caution as reasoned in multiple studies~\citet{leitner2016patterns},~\citet{laaber2019software}, and~\citet{bulej2017stat}.
 
 % Measurement methods designed for variable cloud environment
-Unfavorable conditions for benchmarking in the cloud spiked interest in research that focuses on performance measurement methods that reduce measurement variability, increase accuracy and reduce false positives of regression detection in cloud environment.
-One such method and current best practise~\cite{laaber2019software} is called \emph{Randomized Multiple Iterleaved Trials} (RMIT) introduced by~\citet{abedi2017conducting}.
-Trial refers to a single run of benchmark, with multiple inside iterations, on a particular version of software it measures performance of.
-To compare performance between multiple version of some software --- alternatives one has to run the same benchmark with each alternative.
-RMIT states that these runs of these alternatives should be run (1) multiple times as discussed above and (2) repetitions of all alternatives should be randomized in order to minimize both partial and periodic outside interference.
+Unfavorable conditions for benchmarking in the cloud spiked interest in research that focuses on performance measurement methods that reduce measurement variability, increase accuracy and reduce false positives of regression detection in a cloud environment.
+One such method and current best practise~\cite{laaber2019software} is called \emph{Randomized Multiple Interleaved Trials} (RMIT) introduced by~\citet{abedi2017conducting}.
+Trial refers to a single run of benchmark, with multiple inside iterations, on a particular version of the software it measures the performance of.
+To compare performance between multiple versions of some software --- alternatives one has to run the same benchmark with each alternative.
+RMIT states that these runs of these alternatives should be run (1) multiple times as discussed above and (2) repetitions of all alternatives should be randomized to minimize both partial and periodic outside interference.
 
 % Describe Synchronous Duet benchmarking -~\citet{bulej2020duet}.
 Another novel performance measurement method introduced by~\citet{bulej2019initial} and further examined in~\citet{bulej2020duet} is called \emph{duet benchmarking}.
-Main idea is to run both versions of software in parallel assuming that any outside interference will affect both versions equally.
-Distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowleges presence of variability and relies on fair scheduling to make the impact equal on both version running in parallel.
+The main idea is to run both versions of software in parallel assuming that any outside interference will affect both versions equally.
+The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
 
 % Why ease of the synchronous restriction makes sense?
-Duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads.
-However, duet benchmarking came with its own complexities, predominantly that the method requires synchronized iterations of two harnesses running in parallel.
-In order to use the duet method on mentioned benchmark suites, authors had to modify these suites --- add iteration synchronization capability via a shared memory barrier.
-To broaden the usecase of this method this thesis explores viability of relaxed duet method which omits the synchronized iterations requirement.
-From now on in this text, we would refer to original duet from~\citet{bulej2020duet} as synchronized duet, since starts of iterations need to be synchronized, and the new relaxed approach as asynchronous duet.
+The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads.
+However, duet benchmarking came with its complexities, predominantly that the method requires synchronized iterations of two harnesses running in parallel.
+To use the duet method on mentioned benchmark suites, authors had to modify these suites --- add iteration synchronization capability via a shared memory barrier.
+To broaden the use case of this method this thesis explores the viability of the relaxed duet method which omits the synchronized iterations requirement.
+From now on in this text, we would refer to the original duet from~\citet{bulej2020duet} as the synchronized duet, since the starts of iterations need to be synchronized, and the new relaxed approach as the asynchronous duet.
 For properties common to both methods we will simply refer to both methods as duet.
