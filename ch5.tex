@@ -3,8 +3,8 @@
 
 Describe what has been measured and where.
 
-
-\section{Measurement Setup}
+\section{Experiment Setup}
+\label{sec:experiment_setup}
 
 \subsection{Selected benchmarks}
 
@@ -12,27 +12,17 @@ What benchmarks are in the study and why?
 
 \begin{enumerate}
   \item Renaissance suite
-  \item ScalaBench/DeCappo suite
-  \item some non JVM bench suite - CoreMark / SpecCPU
+  \item ScalaBench/DaCappo suite
+  \item SpecCPU
 \end{enumerate}
-
-\subsubsection{Reasoning on how and why those benchmarks were picked}
 
 Description of what they do. Either reference them and describe few that we will pick later.
 
-Metrics:
-\begin{enumerate}
-  \item CPU - user/sys, pipeline utilization
-  \item Memory
-  \item Interractions with FS
-  \item Rate of parallelism, lock contention
-  \item JVM specific stats
-        \begin{enumerate}
-          \item TODO
-        \end{enumerate}
-\end{enumerate}
+\subsection{Benchmark Configuration}
+\label{sec:benchmark_configuration}
 
-Benchmark profiling?
+Describe how were the benchmarks configured (1) heap parameters (2) validation checks and other options passed to suite harnesses.
+Note that SPECcpu prohibits publication of results without verification but reason why this is the case.
 
 \subsection{Selected platforms}
 
@@ -48,15 +38,6 @@ Describe what platforms were picked, why and what was their configuration.
 
 Number of benchmarks run in different configurations as well as different methods used - asynchronous/synchronous duet, sequential.
 
-
 \section{Measurements}
 
-Address each research question:
-
-\subsection{RQ1: What is the variance of asynchronous-duet compared to synchronous duet and sequential execution?}
-
-\subsection{RQ2: How does choice of environment affect the variance?}
-
-\subsection{RQ3: What are the effects of duet benchmarking on run time and costs?}
-
-\subsection{RQ4: What categories of benchmarks and statistical methods, are viable for asynchronous-duet method. (stretch goal?)}
+% Address each research question:

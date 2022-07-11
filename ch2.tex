@@ -20,7 +20,7 @@ Asynchronous duet runs in parallel as well but does not require synchronized ite
 \end{figure}
 
 % RQ1 Runtime reduction
-This example has the durations of iterations equal for all methods, which illustrates one immediate benefit of running duet benchmarks --- overall runtime reduction.
+The example in \cref{fig:method_timeline} has the durations of iterations equal for all methods, which illustrates one immediate benefit of running duet benchmarks --- overall runtime reduction.
 Ideally, the duet method could save up to $50\%$ or execution run time and hence halve execution costs.
 However, to achieve such speedup, workloads running in parallel must not interfere with each other.
 
@@ -33,7 +33,7 @@ To address mutual workload interference,~\citet{bulej2020duet} set up measuremen
 Even then, it may be the case that the two virtual cores map to the same hardware threads of the same physical core.
 Such virtual cores would then compete for the single shared physical core.
 Here~\citet{bulej2019initial} rely on workload symmetry which states that if a cloud were to exhibit systematic performance difference between the two virtual cores running duet workloads, it would likely exhibit similar unwarranted performance differences in other common concurrent workloads, such behavior would be likely considered a bug and remedied.
-In other words, they rely on fair CPU scheduling to work out mutual interference.
+In other words, they rely on fair CPU scheduling~\footnote{Linux kernel uses "Completely Fair Scheduler" \url{https://en.wikipedia.org/wiki/Completely_Fair_Scheduler}} to work out mutual interference.
 \citet{bulej2019initial} also note that this works only for similar workloads, which can be expected of neighboring commits or versions of the same software.
 
 % External interference, Synchronized interference, Impact symmetry for seqn syncduet and async duet.
@@ -100,14 +100,14 @@ The asynchronous duet method has to show variance improvements on par with the s
 
 % RQ3 Variable environment
 \begin{quote}
-	\textbf{RQ3:} \emph{What is the variance of asynchronous-duet compared to synchronous duet and sequential execution across different envrironments?}
+	\textbf{RQ3:} \emph{What is the variance of asynchronous duet compared to synchronous duet and sequential execution across different envrironments?}
 \end{quote}
 
-Additionally using a similar approach to~\citet{laaber2019software} asynchronous and synchronous duet methods can be compared with sequential measurements in terms of \emph{minimal detectable slowdowns}~\xxx{cref to chap4}.
+Additionally using a similar approach to~\citet{laaber2019software} asynchronous and synchronous duet methods can be compared with sequential measurements in terms of \emph{minimal detectable slowdowns}~\cref{sec:mds}.
 
 % RQ4 Minimal detectable slowdown
 \begin{quote}
-	\textbf{RQ4:} \emph{What are the minimal detectable slowdowns that we can detect with $95\%$ confidence?}
+	\textbf{RQ4:} \emph{What are the minimal detectable slowdowns with sequential, synchronous duet, and asynchronous duet measurements that we can detect with $95\%$ confidence?}
 \end{quote}
 
 % Why is it important - runtime reduction, variable environment, no suite modification

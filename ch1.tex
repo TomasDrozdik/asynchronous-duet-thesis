@@ -19,24 +19,25 @@ If the benchmark code gets bigger it is usually referred to as application bench
 % Introduce benchmark suites
 Benchmarks do not have the sole purpose of measuring the performance of an application, inversely they provide a way to measure the capabilities of some hardware.
 For this reason, many benchmark suites aggregate many application workloads, put them under a single harness, and simplify the performance evaluation process.
-Examples of such suites are from Standard Performance Evaluation Corporation (SPEC) SPECcpu \footnote{SPEC CPU® 2017 \url{https://www.spec.org/cpu2017/}} and SPECjbb \footnote{SPECjbb® 2015 \url{https://www.spec.org/jbb2015/}} other standalone suites used in this thesis are Renaissance suite~\cite{prokopec2019renaissance}, Dacapo \footnote{DaCapo Benchmarks \url{https://dacapo-bench.org/}}, and Scalabench \footnote{Scala Benchmarking Project \url{https://www.scalabench.org/}}.
+Examples of such suites are from Standard Performance Evaluation Corporation (SPEC) SPECcpu \footnote{SPEC CPU® 2017 \url{https://www.spec.org/cpu2017/}} and SPECjbb \footnote{SPECjbb® 2015 \url{https://www.spec.org/jbb2015/}}.
+Other standalone suites used in this thesis are Renaissance~\cite{prokopec2019renaissance}, Dacapo \footnote{DaCapo Benchmarks \url{https://dacapo-bench.org/}}, and Scalabench \footnote{Scala Benchmarking Project \url{https://www.scalabench.org/}} suite.
 All above-mentioned suites are Java-based except for SPECcpu which has benchmarks written in C, C++, and Fortran and hence is natively compiled.
 Apart from testing hardware performance, benchmark suites are good candidates for research in performance measurement methods as they strive to provide a wide range of real-world representative workloads.
 
 % Reason about long execution time and attractiveness of the cloud approach
 The requirement for multiple repetitions causes an inherent trade-off between accuracy and execution time.
-Execution of a benchmark suite for some software project version, to identify newly introduced performance regression, can take an overwhelming 3000 machine hours per day as analyzed by~\citet{bulej2020duet} on an open-source GraalVM project~\footnote{Oracle. GraalVM repository at GitHub \url{https://github.com/oracle/graal}}.
+Execution of a benchmark suite for some software project version, with the goal to identify newly introduced performance regression, can take an overwhelming 3000 machine hours per day as analyzed by~\citet{bulej2020duet} on an open-source GraalVM project~\footnote{Oracle. GraalVM repository at GitHub \url{https://github.com/oracle/graal}}.
 By then a new version could have come around.
-This trade-off between measurement execution times and the amount of tested code change can be addressed from multiple angles.
-One is to reduce the amount of code to be tested by identification of commits that might introduce performance regresssion~\citet{oliveira2017perphecy}.
-Other is to reduce the execution time by measurement parallelization.
-\xxx{Can these be combined?}
-However, maintaining multiple dedicated machines is difficult and costly \xxx{cite} and that is why much research over the past decade~\cite{leitner2016patterns, laaber2019software, abedi2017conducting} has focused on offloading performance measurements to the cloud.
+This trade-off between measurement execution time and the number of commits between tested versions can be addressed from multiple angles.
+One is to reduce the number of measurements by identification of commits that might introduce performance regresssion~\citet{oliveira2017perphecy}.
+Other is to reduce the execution time of measurements by parallelization.
+Effective parallelization involves maintaining multiple dedicated machines which is difficult and costly~\xxx{cite}.
+Therefore, much research over the past decade~\cite{leitner2016patterns, laaber2019software, abedi2017conducting} has focused on offloading performance measurements to the cloud.
 
 % Describe the nature of benchmarking in the cloud
 Cloud offers practically infinite hardware scaling capabilities with on-demand access and a pay-for-what-you-use principle.
 That makes it a tempting platform for fast and accessible performance measurements.
-Cloud offers large scale of options to run your code on from bare metal offerings \footnote{AWS Outposts \url{https://aws.amazon.com/outposts/}} to running small pieces of code \footnote{AWS Lambda \url{https://aws.amazon.com/lambda/}}.
+Cloud offers large scale of options to run your code on from bare metal offerings \footnote{AWS Outposts \url{https://aws.amazon.com/outposts/}} to running small pieces of code as lambdas~\footnote{AWS Lambda \url{https://aws.amazon.com/lambda/}}.
 The most commonly examined and accessible method is an Infrastructure-as-a-Service (IaaS) cloud offering where computing resources are acquired and released as a service.
 
 IaaS is typically in form of virtual machines or containers with attached virtual disks.
@@ -50,14 +51,14 @@ A common concern is that a given instance type may not run on the same type of h
 Hardware heterogeneity, shared and virtualized infrastructure further amplifies the variability of performance measurements in the cloud environment~\cite{leitner2016patterns} even to the point that using state-of-the-art statistical methods and performance measurements practitioners might not be able to detect $1000\%$ slowdown of some measured software as shown by~\citet{laaber2019software}.
 
 % Introduce statistical methods, later on, mention repeatability, cite do we teach useful statistics?
-With many repetitions and variability across the results, it is necessary to carefully process the results and use statistical methods to get an answer to find out if a code change introduces a new performance regression.
-The use of statistical methods has been extensively studied in~\citet{bulej2017stat} and further verified in~\citet{laaber2019software} specifically in the cloud context.
+With many repetitions and variability across the results, it is necessary to carefully process the results and use statistical methods to find out if a code change introduces a new performance regression.
+The use of statistical methods has been extensively studied in~\citet{bulej2017stat} and further analyzed in~\citet{laaber2019software} specifically in the cloud context.
 To quantify the variability of the distribution of results from a benchmark~\citet{laaber2019software} use coefficient of variance, also called mean standard deviation.
 To compare results of two software versions~\citet{bulej2017stat} use both methods of overlapping confidence intervals computed by bootstrap procedure and hypothesis testing with Wilcoxon rank-sum test and its variation Mann-Whiteney U-test as well as Welch's t-test.
 \citet{bulej2017stat} also raise concerns about the validity of these methods when used for performance measurement data.
 Concerns stem from the fact that performance measurements don't satisfy many common assumptions that statistical methods make such as random independent and identicaly distributed samples and asymptotic normality of the data.
 Moreover, performance data also tend to exhibit long-range dependencies between samples, have unknown distributions with long long tails, and are not stationary in general which further complicates statistical analysis~\cite{bulej2017stat}.
-So far there does not seem to be any "silver bullet" statistical method that would be a good fit for performance data and thus these techniques need to be used with caution as reasoned in multiple studies~\citet{leitner2016patterns},~\citet{laaber2019software}, and~\citet{bulej2017stat}.
+So far there does not seem to be any "silver bullet" statistical method that would be a good fit for performance data and thus these techniques need to be used with caution as reasoned in multiple studies~\cite{leitner2016patterns, laaber2019software, bulej2017stat}.
 
 % Measurement methods designed for variable cloud environment
 Unfavorable conditions for benchmarking in the cloud spiked interest in research that focuses on performance measurement methods that reduce measurement variability, increase accuracy and reduce false positives of regression detection in a cloud environment.
@@ -72,7 +73,7 @@ The main idea is to run both versions of software in parallel assuming that any 
 The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
 
 % Why ease of the synchronous restriction makes sense?
-The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads.
+The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2022duet}.
 However, duet benchmarking came with its complexities, predominantly that the method requires synchronized iterations of two harnesses running in parallel.
 To use the duet method on mentioned benchmark suites, authors had to modify these suites --- add iteration synchronization capability via a shared memory barrier.
 To broaden the use case of this method this thesis explores the viability of the relaxed duet method which omits the synchronized iterations requirement.

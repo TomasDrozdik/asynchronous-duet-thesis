@@ -1,34 +1,63 @@
 \chapter{Overview of Results Processing}
 \label{chap:results}
 
-Essentially: describe data manipulation and statistics in the analysis notebooks.
+With multiple repetitions and substantial variance in measurements statistical analysis is used to determine performance regression in A/B run.
+However, finding a software project that exhibits certain slowdowns is difficult.
+More so if it has to apply to particular machine experiments are measured on.
 
+\section{A/A runs}
+
+Therefore research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
+A/A measurements compares the same version side by side and later labels runs with A and B labels.
+Since the code is the same the performance should be the same as well.
+Different statistical methods such as confidence intervals and hypothesis testing are used to evaluate if performance of A/B labeled runs is the same.
 
 \section{Data filtering}
 
-\begin{description}
-    \item[Outliers] how to deal with outliers
-    \item[Warmup] how to determine warmup time, in particullar for Java benchmarks
-    \item[Windsorization]
-\end{description}
+Initially, custom best practise is to filter out outliers and warmup runs.
+Outliers are natural occurence not only in cloud environment.
+\citet{laaber2019software} even tried to explain some order of magnitude outliers by matching particular measurements to some potentially harmful events.
+Even after discussion with the provider they were not able to explain them.
+
+Warmups are typical for managed run time environment such as Java Virtual Machine.
+\citet{horky2015java} note that detecting warmups is difficult \xxx{read what is says about warmup}.
+
+Since both outlier filtering and warmups detection are difficult to manage we have decided to use filtering from other papers.
+For example \citet{laaber2019software} decided to remove first 10 out of 25 measurements per run of Java benchmark as warmup.
+They also removed outliers that were order of magnitude diffrent from the rest --- that turned out to be \xxx{1-2\% of measurements in total}.
+
+Similarly in~\citet{bulej2020duet} authors decided to remove first half of Java measurements per run.
+In this case outliers were removed by windsorization --- replacing at most \xxx{todo}.
+
+In our experiments we remove first half of all Java benchmarks as they are using the same benchmark suites as the ones in~\citet{bulej2020duet}.
+Then apply orders of magnitude ourlier filtering as in~\citet{laaber2019software} to keep the data as representative as possible.
+Outliers turned out to be \xxx{toto \%} of our data set.
+
+\section{Variance analysis}
 
 
-\section{Pre-processing}
 
-Processing results of benchmarks into standardized format - CSV for further analysis.
+\subsection{Variance of single result distribution}
 
-How and what metrics does the harness gather?
-\begin{enumerate}
-    \item Absolute iteration start-end time
-    \item Overlap
-    \item Weighted Overlap
-    \item Other...
-\end{enumerate}
+\subsection{Variance of a duet run}
 
+\subsubsection{Synchronous duet}
 
-\section{Varience analysis}
+\subsubsection{Asynchronous duet}
 
-Address each used statistical method.
-Bootstrapping, Confidence intervals and tests.
+\subsection{Comparing variance between measurement methods}
 
-Describe utilization of A/A runs and A/B runs on known regressions.
+\subsubsection{Confidence intervals}
+
+\subsubsection{Hypothesis testing}
+
+\section{Minimal detectable slowdown}
+\label{sec:mds}
+
+Same as in~\citet{laaber2019software}, caveats with the overlaps.
+
+\subsection{Emulating slowdown}
+
+\subsection{Overlapping confidence intervals}
+
+\subsection{Mann-Whiteney U-test}
