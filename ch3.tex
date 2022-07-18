@@ -1,5 +1,6 @@
 \chapter{Implementation}
 
+\vh{Simply: We implemented a super-harness ... }
 Part of this thesis is to implement the asynchronous duet benchmark super-harness that takes an existing benchmark harness as an input and executes its benchmarks in the asynchronous duet style.
 This kind of tool should greatly simplify the general use of the asynchronous duet method.
 
@@ -9,6 +10,7 @@ Tool is named \lstinline{duetbench} and it is part of open sourced~\footnote{Apa
 Source code is available as an attachment to this thesis~\xxx{ref} and it has documentation in form of GitHub wiki~\cite{wiki}.
 
 % Docker -> different environment -> support for both sequential and synchronous duet runs
+\vh{Again: we want to compare our results with bulej, hence our harness supports also other modes of operation.}f
 Since one of the goals of this thesis is to compare asynchronous duet with synchronous and sequential method usage of containers makes direct comparison with~\citet{bulej2020duet} unreasonable.
 Therefore \lstinline{duetbench} supports all three benchmarking methods in a containerized environment.
 
@@ -17,7 +19,7 @@ Therefore \lstinline{duetbench} supports all three benchmarking methods in a con
 \Cref{fig:duetbench_sequence} depicts architecture of \lstinline{duetbench} script.
 \lstinline{duetbench} is a process on the host machine that spawns subprocesses that run containers --- one for each version A/B.
 Since initialization of a container might take longer \lstinline{duetbench} waits for both containers to start and then uses \lstinline{docker exec}~\footnote{\lstinline{docker exec} reference \url{https://docs.docker.com/engine/reference/commandline/exec/}, July 2022} to run the command that executes the benchmark harness loop from~\cref{alg:harness}.
-Then once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them in some fixed format to preserve information about a particular run.
+Then once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them \vh{be more specific} in some fixed format to preserve information about a particular run.
 Afterward, stop and clean up both containers.
 We refer to this process is as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting}.
 The distinction is that one \emph{run} can run 2 benchmarks in parallel in case of a duet run, but it may also run just a single benchmark in case of sequential run.
@@ -37,6 +39,16 @@ If there are more benchmarks to execute pick the next one (according a particula
 In the case of the sequential method, the process is very much the same just omit the second container entirely and run them separately.
 
 \subsection{Synchronized duet in containerized environment}
+
+\vh{Switch the point of view: Bulej uses shared-memory barrier to synchronize the runs.
+We ported this solution into the containers to mimic the original behaviour. \\
+New para: The barrier uses pthread API that is not available on all systems supporting Docker (such as Mac).
+Therefore we start a third container to initialize the barrier, hence bypassing the missing functionality on the host system.\\
+New para: Docker environments are by definition separated and we had to specifically enable memory sharing among them.
+To enable this feature, we had to append \texttt{-v ...} etc. etc. \\
+\\
+Do not make it into a Ms Marple story: state the important thing first, explain details later.
+It is fine to let the user skip some paragraphs by adding ,,Technical details are described in the following paragraphs''.}
 
 In the case of the synchronized duet, the benchmark harness needs to be modified as in~\citet{bulej2020duet}.
 Additionally,~\citet{bulej2020duet} synchronize the iterations using shared memory barrier placed in \lstinline{/dev/shm} before benchmarks are started.

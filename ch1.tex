@@ -1,6 +1,8 @@
 \chapter{Background and Motivation}
 \label{chap:background}
 
+\vh{Very dense, consider splitting into subsections.}
+
 % Software measurement for performance comparison
 Measurement experiments are a core part of performance comparison activities.
 A fast, accurate, and accessible performance comparison method can prevent the introduction of performance regressions during the software development process.
@@ -12,6 +14,7 @@ Benchmark code itself can have its share of non-determinism that contributes to 
 
 % Introduce benchmarks
 Benchmark harness executes benchmark code in multiple iterations and then presents score --- time in nanoseconds per each iteration.
+\vh{The score can be throughput too and the setup can be more complicated.}
 When a benchmark is a small piece of code, also referred to as performance unit tests by~\citet{horky2015unit}, it is usually written in some microbenchmark framework.
 Microbenchmark execution in a public cloud has been thoroughly examined by~\citet{laaber2019software}.
 If the benchmark code gets bigger it is usually referred to as application benchmarks.
