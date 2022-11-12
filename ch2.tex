@@ -53,9 +53,8 @@ It might seem that an asynchronous duet solves this issue because iterations are
 
 However, asynchronous duet might be worse off in terms of equal impact symmetry on parallel workloads due to the ways benchmark harnesses and benchmarks themselves work.
 \Cref{alg:harness} is a generic example of what an inner loop of a benchmark harness might look like.
-Pre-iteration and post-iteration functions might do some environment checks like running garbage collection or recording results.
-Benchmark harness authors did not have any reason to care about reducing noise around the measured code or keeping the loop tight.
-Therefore it is natural that asynchronous duet might suffer from this.
+Pre-iteration and post-iteration functions might do some environment checks like running garbage collection, recording or validating results.
+Therefore, it is natural that these additional steps create gaps between measured code and that impacts asynchronous duet symmetry.
 
 \begin{algorithm}
 \begin{algorithmic}
@@ -121,5 +120,5 @@ To summarize research into duet methods this thesis focuses on:
 \begin{description}
 	\item[Runtime and Cost reduction] Duet methods have the potential to drastically reduce, up to $50\%$, the execution time of benchmarks.
 	\item[Accuracy] Synchronized duet method can reduce the variance of benchmark results measured in a variable environment, such as a public cloud~\citet{bulej2020duet}. The question is if the asynchronous duet can do the same?
-	\item[Accesibility] Asynchronous duet relaxes the synchronized requirement on benchmark harnesses which makes this method more broadly usable.
+	\item[Accessibility] Asynchronous duet relaxes the synchronized requirement on benchmark harnesses which makes this method more broadly usable.
 \end{description}

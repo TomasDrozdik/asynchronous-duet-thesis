@@ -1,40 +1,40 @@
 \chapter{Overview of Results Processing}
 \label{chap:results}
 
-With multiple repetitions and substantial variance in measurements statistical analysis is used to determine performance regression in A/B run.
+With multiple repetitions and substantial variance in measurements statistical analysis is used to determine performance regression in an A/B run.
 However, finding a software project that exhibits certain slowdowns is difficult.
 More so if it has to apply to particular machine experiments are measured on.
 
 \section{A/A runs}
 
-Therefore research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
-A/A measurements compares the same version side by side and later labels runs with A and B labels.
+Therefore, research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
+A/A measurements compares the same versions and later labels runs with A and B labels.
 Since the code is the same the performance should be the same as well.
 Different statistical methods such as confidence intervals and hypothesis testing are used to evaluate if performance of A/B labeled runs is the same.
+In the context of duet runs A/B labeling is performed in context of duet pairs.
 
 \section{Data filtering}
 
-Initially, custom best practise is to filter out outliers and warmup runs.
-Outliers are natural occurence not only in cloud environment.
-\citet{laaber2019software} even tried to explain some order of magnitude outliers by matching particular measurements to some potentially harmful events.
+Initially, custom best practice is to filter out outliers and warm up runs.
+Outliers are a natural occurrence not only in the cloud environment.
+\citet{laaber2019software} tried to explain some order of magnitude outliers by matching particular measurements to some potentially harmful events.
 Even after discussion with the provider they were not able to explain them.
 
 Warmups are typical for managed run time environment such as Java Virtual Machine.
-\citet{horky2015java} note that detecting warmups is difficult \xxx{read what is says about warmup}.
+\citet{horky2015java} note that detecting warm-ups is difficult \xxx{read what is says about warm up}.
 
-Since both outlier filtering and warmups detection are difficult to manage we have decided to use filtering from other papers.
+Since both outlier filtering and warm-ups detection are difficult to manage we have decided to use filtering similar to aforementioned papers.
 For example \citet{laaber2019software} decided to remove first 10 out of 25 measurements per run of Java benchmark as warmup.
-They also removed outliers that were order of magnitude diffrent from the rest --- that turned out to be \xxx{1-2\% of measurements in total}.
+They also removed outliers that were order of magnitude different from the rest --- that turned out to be \xxx{1-2\% of measurements in total}.
 
-Similarly in~\citet{bulej2020duet} authors decided to remove first half of Java measurements per run.
-In this case outliers were removed by windsorization --- replacing at most \xxx{todo}.
+Similarly, in~\citet{bulej2020duet} authors decided to remove first half of Java measurements per run.
+In this case outliers were removed by windsorization --- replacing at most one observation in a run with its nearest neighbor when that observation is further than $20\%$ away from min-max range of the remaining observations.
 
 In our experiments we remove first half of all Java benchmarks as they are using the same benchmark suites as the ones in~\citet{bulej2020duet}.
 Then apply orders of magnitude ourlier filtering as in~\citet{laaber2019software} to keep the data as representative as possible.
-Outliers turned out to be \xxx{toto \%} of our data set.
+Outliers turned out to be \xxx{todo \%} of our data set.
 
 \section{Variance analysis}
-
 
 
 \subsection{Variance of single result distribution}

@@ -67,7 +67,7 @@ The advantage of such an approach is that docker containers access to \lstinline
 \begin{description}
     \item[Sequential] where benchmarks are run in order of definition from configuration file.
     \item[Randomized Interleaving Trials] where it randomly interleaves the runs from a configuration file.
-        Hence it can mix different types of measurement methods and benchmarks.
+        Hence, it can mix different types of measurement methods and benchmarks.
         With multiple repetitions of a given measurement method it is essentially RMIT\cite{abedi2017conducting}.
 \end{description}
 
@@ -110,9 +110,8 @@ avrora:
 \label{sec:result_parsing}
 
 Once a run finishes, results are copied in their raw format to a dedicated result directory on the host machine.
-Results are then processed to some common format for further analysis.
-For this purpose \lstinline{duet} package has \lstinline{duetprocess} script~\cite{wiki}.
-It takes an output directory of \lstinline{duetbench} and produces single results file in CSV format.
+Results are then processed using \lstinline{duetprocess} script~\cite{wiki} for further analysis.
+\lstinline{duetprocess} takes an output directory of \lstinline{duetbench} as an input and produces a single CSV result file.
 
 The minimal schema of a result data point looks like this:
 \begin{itemize}
@@ -120,7 +119,7 @@ The minimal schema of a result data point looks like this:
         \begin{itemize}
             \item suite
             \item benchmark
-            \item run: repetetion id, not necessarily run in order
+            \item run: repetetion id, not necessary in  order of execution
             \item pair
             \item pair order: which pair was started first
             \item iteration
@@ -187,8 +186,8 @@ O_{R_A, R_B} =& \{(i^A_i, i^B_j) | overlap\_start(i^A_i, i^B_j) < overlap\_end(i
               &\forall i \in \{1 \dots iters\}, \forall j \in \{1 \dots iters\}\} \\
 \end{align*} 
 
-However, not all overlaps are equaly important.
-As shown in~\cref{fig:overlap_timeline} and \emph{RQ2} introduction some overlaps might be really small and cover start of one iteration with the end of another.
+However, not all overlaps are equally important.
+As shown in~\cref{fig:overlap_timeline} and \emph{RQ2} introduction some overlaps might be tiny and cover start of one iteration with the end of another.
 Following notations are used to express quality of an overlap:
 
 \xxx{TODO: add weighted overlaps versions}
