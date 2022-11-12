@@ -34,7 +34,9 @@ However, to achieve such speedup, workloads running in parallel must not interfe
 To address mutual workload interference,~\citet{bulej2020duet} set up measurements in such a way that each benchmark was restricted to a single dedicated virtual core.
 Even then, it may be the case that the two virtual cores map to the same hardware threads of the same physical core.
 Such virtual cores would then compete for the single shared physical core.
-Here~\citet{bulej2019initial} rely on workload symmetry which states that if a cloud were to exhibit systematic performance difference between the two virtual cores running duet workloads, it would likely exhibit similar unwarranted performance differences in other common concurrent workloads, such behavior would be likely considered a bug and remedied.
+Here~\citet{bulej2019initial} rely on workload symmetry.
+
+Workload symmetry states that if a cloud were to exhibit systematic performance difference between the two virtual cores running duet workloads, it would likely exhibit similar unwarranted performance differences in other common concurrent workloads, such behavior would be likely considered a bug and remedied.
 In other words, they rely on fair CPU scheduling~\footnote{Linux kernel uses "Completely Fair Scheduler" \url{https://en.wikipedia.org/wiki/Completely_Fair_Scheduler}} to work out mutual interference.
 \citet{bulej2019initial} also note that this works only for similar workloads, which can be expected of neighboring commits or versions of the same software.
 
@@ -46,6 +48,8 @@ In other words, they rely on fair CPU scheduling~\footnote{Linux kernel uses "Co
 \Cref{fig:method_timeline} also note that synchronized duet methods are not always running in parallel.
 Once an iteration finishes it has to wait for its pair iteration to finish, until then, this pair iteration runs alone.
 It might seem that an asynchronous duet solves this issue because iterations are not blocked on the barrier, so the only iteration running alone will be the last iteration of either A or B, whichever finishes last.
+
+\xxx{Consider including actual example of speedup where workload A is 2x faster than B, but B runs alone at the end so B is actually only 1.5x faster.}
 
 However, asynchronous duet might be worse off in terms of equal impact symmetry on parallel workloads due to the ways benchmark harnesses and benchmarks themselves work.
 \Cref{alg:harness} is a generic example of what an inner loop of a benchmark harness might look like.
@@ -75,10 +79,16 @@ Therefore, it is natural that these additional steps create gaps between measure
 \label{alg:harness}
 \end{algorithm}
 
-\Cref{fig:overlap_timeline} figure shows what implications can the absence of synchronization have on workload overlaps.
+\Cref{fig:overlap_timeline} shows what implications can the absence of synchronization have on workload overlaps.
 With enough iterations, harness specifics, and potentially different A/B performance workloads will inevitably diverge.
+
 Even if workloads are partially overlapping, the start of a workload might do different things, for example, be CPU bound while the end of the workload might be I/O bound.
-This further hinders the impact symmetry for the asynchronous duet that the synchronous duet method relies on.
+Fair CPU scheduling should, in theory, allocate the same amount of processor time for both workloads essentially synchronizing them.
+However, in practice, due to inherent variability of these systems workloads will diverge.
+
+For example, \cref{fig:overlap_interference} demonstrates a case when this happens.
+Even workloads with the same performance might get to a state of equilibrium where parts of workloads with different bound nature overlap each other.
+This kind of symmetry can further hinder the impact symmetry argument for the synchronous duet method.
 Therefore, out next research question examines the way duet pairs overlap:
 
 % RQ2 Overlaps
@@ -90,12 +100,26 @@ Therefore, out next research question examines the way duet pairs overlap:
 	\centering
 	\includegraphics[width=.9\linewidth]{./figures/overlap_timeline.pdf}
 	\caption{
-		Tailored examples of how lack of synchronization might affect overlap of timed benchmark code.
+		Tailored examples of how lack of synchronization and time in between workload execution might affect duet overlap.
 		This is an example timeline of iterations of an \emph{asynchronous duet} measurement from an iteration $i$ and $j$ for versions $A$ and $B$ respectively.
 		Focus on how versions $A$ and $B$ overlap --- just partially or even not at all.
 	}
 	\label{fig:overlap_timeline}
 \end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.9\linewidth]{./figures/overlap_interference.pdf}
+	\caption{
+		Tailored examples of how different nature of a workload might compromise duet's impact symmetry.
+		Initially $A$ and $B$ overlap on both CPU and I/O bound parts which slows down $B$ for first 2 runs.
+		Then however, CPU and I/O bound parts of $A$ and $B$ workloads overlap less end $B$ turns out to be as fast as $A$.
+		Notice that $A$ and $B$ enter a state of equilibrium where each is bound on different parts of underlying hardware.
+	}
+	\label{fig:overlap_interference}
+\end{figure}
+
+\xxx{Consider nature of long vs. short outside interference and its frequency, very short messes us up while very long is fine for duet and seqn depending on RMIT runtime. There is some sweet spot that duet will perform better with compared to seqn.}
 
 For the asynchronous duet method to be useful runtime reduction and overlapping workloads are not enough.
 The asynchronous duet method has to show variance improvements on par with the synchronized duet method:
