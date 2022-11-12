@@ -1,28 +1,23 @@
 \chapter{Implementation}
 
-\vh{Simply: We implemented a super-harness ... }
-Part of this thesis is to implement the asynchronous duet benchmark super-harness that takes an existing benchmark harness as an input and executes its benchmarks in the asynchronous duet style.
-This kind of tool should greatly simplify the general use of the asynchronous duet method.
+We implemented a super-harness that takes an existing benchmark harness as an input and executes its benchmarks in the asynchronous duet style.
 
 % Running in docker and reasons for it
 To keep a configuration portable and the dependencies minimal we have decided to use the container technology, namely Docker~\cite{merkel2014docker} or Podman~\footnote{\url{https://podman.io/}, July 2022}.
 Tool is named \lstinline{duetbench} and it is part of open sourced~\footnote{Apache Licence 2.0} python package \lstinline{duet}~\footnote{\url{https://github.com/TomasDrozdik/asynchronous-duet}, July 2022} that also implements other complementary tools described in~\cref{sec:result_parsing}.
 Source code is available as an attachment to this thesis~\xxx{ref} and it has documentation in form of GitHub wiki~\cite{wiki}.
 
-% Docker -> different environment -> support for both sequential and synchronous duet runs
-\vh{Again: we want to compare our results with bulej, hence our harness supports also other modes of operation.}f
-Since one of the goals of this thesis is to compare asynchronous duet with synchronous and sequential method usage of containers makes direct comparison with~\citet{bulej2020duet} unreasonable.
-Therefore \lstinline{duetbench} supports all three benchmarking methods in a containerized environment.
+We want to compare asynchronous duet with~\citet{bulej2020duet}, hence our super-harness supports synchronized duet and sequential method in containerized environment.
 
 \section{Architecture}
 
 \Cref{fig:duetbench_sequence} depicts architecture of \lstinline{duetbench} script.
 \lstinline{duetbench} is a process on the host machine that spawns subprocesses that run containers --- one for each version A/B.
-Since initialization of a container might take longer \lstinline{duetbench} waits for both containers to start and then uses \lstinline{docker exec}~\footnote{\lstinline{docker exec} reference \url{https://docs.docker.com/engine/reference/commandline/exec/}, July 2022} to run the command that executes the benchmark harness loop from~\cref{alg:harness}.
-Then once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them \vh{be more specific} in some fixed format to preserve information about a particular run.
+Since initialization of a container might take longer \lstinline{duetbench} waits for both containers to start and then uses \lstinline{docker exec}~\footnote{\url{https://docs.docker.com/engine/reference/commandline/exec/}} to run the command that executes the benchmark harness loop from~\cref{alg:harness}.
+Once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them in predefined directory structure that preserves super-harness metadata and raw results~\cite{wiki}.
 Afterward, stop and clean up both containers.
-We refer to this process is as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting}.
-The distinction is that one \emph{run} can run 2 benchmarks in parallel in case of a duet run, but it may also run just a single benchmark in case of sequential run.
+We refer to this process is as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting} for sequential runs.
+For duet methods one \emph{run} executes 2 benchmarks in parallel.
 
 \begin{figure}
 	\centering
@@ -40,25 +35,14 @@ In the case of the sequential method, the process is very much the same just omi
 
 \subsection{Synchronized duet in containerized environment}
 
-\vh{Switch the point of view: Bulej uses shared-memory barrier to synchronize the runs.
-We ported this solution into the containers to mimic the original behaviour. \\
-New para: The barrier uses pthread API that is not available on all systems supporting Docker (such as Mac).
-Therefore we start a third container to initialize the barrier, hence bypassing the missing functionality on the host system.\\
-New para: Docker environments are by definition separated and we had to specifically enable memory sharing among them.
-To enable this feature, we had to append \texttt{-v ...} etc. etc. \\
-\\
-Do not make it into a Ms Marple story: state the important thing first, explain details later.
-It is fine to let the user skip some paragraphs by adding ,,Technical details are described in the following paragraphs''.}
+\citet{bulej2020duet} uses shared-memory barrier to synchronize benchmark iterations.
+We ported this solution into the containers to mimic the original behavior.
 
-In the case of the synchronized duet, the benchmark harness needs to be modified as in~\citet{bulej2020duet}.
-Additionally,~\citet{bulej2020duet} synchronize the iterations using shared memory barrier placed in \lstinline{/dev/shm} before benchmarks are started.
-Then each benchmark invocation gets a path to this shared barrier file and their harness blocks on this barrier before each iteration.
-To facilitate similar behavior between containers \lstinline{duetbench} starts the dockers with mounted volumes \lstinline{-v /dev/shm:/dev/shm} and shared inter process communication namespace \lstinline{--ipc host}~\footnote{\lstinline{docker run} reference \url{https://docs.docker.com/engine/reference/run/}, July 2022}.
-Last but not least, something has to create this shared memory barrier and clean it up afterward.
+The barrier uses pthread API that is not available on all systems such as macOS.
+Therefore, \lstinline{duetbench} starts a third container to initialize, and later cleanup, the barrier, hence bypassing the missing functionality on the host system.
 
-Barrier is made with \lstinline{pthread_barrier_init}~\footnote{\lstinline{man 3 pthread_barrier_init}}, however this call is not available on all Unixes for example macOS~\footnote{macOS Monterey Version 12.3.1}.
-Instead, \lstinline{duetbench} creates these barriers from one of the containers, since both have mounted the same volume \lstinline{/dev/shm}.
-The advantage of such an approach is that docker containers access to \lstinline{pthread_barrier_init} even though the underlying host might not~\footnote{Since Docker on both macOS and Windows still runs Linux VM underneath docker containers \url{https://www.docker.com/blog/the-magic-behind-the-scenes-of-docker-desktop/}, July 2022}.
+Docker environments are separated by design.
+To facilitate this feature \lstinline{duetbench} mounts host directory \lstinline{-v /dev/shm:/dev/shm} and shares inter process communication namespace \lstinline{--ipc host}~\footnote{\lstinline{docker run} reference \url{https://docs.docker.com/engine/reference/run/}}.
 
 \subsection{Run Scheduling}
 \label{sec:scheduling}

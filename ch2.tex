@@ -21,20 +21,16 @@ Asynchronous duet runs in parallel as well but does not require synchronized ite
 
 % RQ1 Runtime reduction
 The example in \cref{fig:method_timeline} has the durations of iterations equal for all methods, which illustrates one immediate benefit of running duet benchmarks --- overall runtime reduction.
-Ideally, the duet method could save up to $50\%$ or execution run time and hence halve execution costs.
-However, to achieve such speedup, workloads running in parallel must not interfere with each other.
-
-\vh{The RQ comes out of the blue. At least for the first one consider a slower build-up to the actual RQ.
-Like, As this speedup is crucial for time (and monetary) reasons, we will investigate it thoroughly in this thesis.
-A research question we would like to see answered is therefore...\\
-The other RQ does not need such slow introduction but they are kind of out-of-context.\\
-It is also possible to specify the RQs at the end of the whole chapter as a summary (e.g. instead of the final \texttt{description} environment).}
+In an ideal case the duet method could save up to $50\%$ of execution run time and hence halve execution costs.
+As this speedup is crucial for time and monetary reasons, we will investigate it thoroughly in this thesis.
+A research question we would like to see answered is therefore:
 
 \begin{quote}
 	\textbf{RQ1:} \emph{What are the runtime savings of duet methods compared to the sequential method?}
 \end{quote}
 
 % Mutual interference
+However, to achieve such speedup, workloads running in parallel must not interfere with each other.
 To address mutual workload interference,~\citet{bulej2020duet} set up measurements in such a way that each benchmark was restricted to a single dedicated virtual core.
 Even then, it may be the case that the two virtual cores map to the same hardware threads of the same physical core.
 Such virtual cores would then compete for the single shared physical core.
@@ -83,6 +79,7 @@ Therefore, it is natural that these additional steps create gaps between measure
 With enough iterations, harness specifics, and potentially different A/B performance workloads will inevitably diverge.
 Even if workloads are partially overlapping, the start of a workload might do different things, for example, be CPU bound while the end of the workload might be I/O bound.
 This further hinders the impact symmetry for the asynchronous duet that the synchronous duet method relies on.
+Therefore, out next research question examines the way duet pairs overlap:
 
 % RQ2 Overlaps
 \begin{quote}
@@ -101,14 +98,14 @@ This further hinders the impact symmetry for the asynchronous duet that the sync
 \end{figure}
 
 For the asynchronous duet method to be useful runtime reduction and overlapping workloads are not enough.
-The asynchronous duet method has to show variance improvements on par with the synchronized duet method.
+The asynchronous duet method has to show variance improvements on par with the synchronized duet method:
 
 % RQ3 Variable environment
 \begin{quote}
-	\textbf{RQ3:} \emph{What is the variance of asynchronous duet compared to synchronous duet and sequential execution across different envrironments?}
+	\textbf{RQ3:} \emph{What is the variance of asynchronous duet compared to synchronous duet and sequential execution across different environments?}
 \end{quote}
 
-Additionally using a similar approach to~\citet{laaber2019software} asynchronous and synchronous duet methods can be compared with sequential measurements in terms of \emph{minimal detectable slowdowns}~\cref{sec:mds}.
+Additionally, using a similar approach to~\citet{laaber2019software} asynchronous and synchronous duet methods can be compared with sequential measurements in terms of \emph{minimal detectable slowdowns}~\cref{sec:mds}:
 
 % RQ4 Minimal detectable slowdown
 \begin{quote}

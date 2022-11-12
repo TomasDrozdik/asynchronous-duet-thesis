@@ -1,8 +1,6 @@
 \chapter{Background and Motivation}
 \label{chap:background}
 
-\vh{Very dense, consider splitting into subsections.}
-
 % Software measurement for performance comparison
 Measurement experiments are a core part of performance comparison activities.
 A fast, accurate, and accessible performance comparison method can prevent the introduction of performance regressions during the software development process.
@@ -38,6 +36,7 @@ Effective parallelization involves maintaining multiple dedicated machines which
 Therefore, much research over the past decade~\cite{leitner2016patterns, laaber2019software, abedi2017conducting} has focused on offloading performance measurements to the cloud.
 
 % Describe the nature of benchmarking in the cloud
+\subsection{Benchmarking in the cloud}
 Cloud offers practically infinite hardware scaling capabilities with on-demand access and a pay-for-what-you-use principle.
 That makes it a tempting platform for fast and accessible performance measurements.
 Cloud offers large scale of options to run your code on from bare metal offerings \footnote{AWS Outposts \url{https://aws.amazon.com/outposts/}} to running small pieces of code as lambdas~\footnote{AWS Lambda \url{https://aws.amazon.com/lambda/}}.
@@ -71,6 +70,7 @@ To compare performance between multiple versions of some software --- alternativ
 RMIT states that these runs of these alternatives should be run (1) multiple times as discussed above and (2) repetitions of all alternatives should be randomized to minimize both partial and periodic outside interference.
 
 % Describe Synchronous Duet benchmarking -~\citet{bulej2020duet}.
+\subsection{Duet method}
 Another novel performance measurement method introduced by~\citet{bulej2019initial} and further examined in~\citet{bulej2020duet} is called \emph{duet benchmarking}.
 The main idea is to run both versions of software in parallel assuming that any outside interference will affect both versions equally.
 The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
