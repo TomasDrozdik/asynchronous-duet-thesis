@@ -1,43 +1,245 @@
-\chapter{Evaluation}
+\chapter{Experimental evaluation}
 \label{chap:evaluation}
 
-Describe what has been measured and where.
+We compare the benchmarking methods on multiple experiments in multiple environments.
+All experiments were run on super-harness described in~\cref{chap:impl}.
+This super harness executes A/A benchmarks from multiple benchmark suites using sequential, synchronous and asynchronous duet benchmarking methods.
 
-\section{Experiment Setup}
+\section{Experiment setup}
 \label{sec:experiment_setup}
 
-\subsection{Selected benchmarks}
+Benchmark suites used in the experiments are Renaissance, ScalaBench, DaCapo, and  Spec CPU 2017.
+Latter three are also part of~\citet{bulej2020duet} and two of those --- ScalaBench and DaCapo are representatives for synchronous duet method as their harnesses were adapted to work with \lstinline{duetbench}.
 
-What benchmarks are in the study and why?
+Renaissance benchmark suite was selected as modern JVM suite with focus on parallel workloads among others\cite{prokopec2019renaissance}.
+We used version $0.13$ and had to exclude \lstinline{neo4j-analytics} benchmark as it failed to execute on our configuration.
 
-\begin{enumerate}
-  \item Renaissance suite
-  \item ScalaBench/DaCappo suite
-  \item SpecCPU
-\end{enumerate}
+ScalaBench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have significant overlap in benchmarks but are the only once that have their runtime altered to run synchronous duet.
+For DaCapo and ScalaBench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat},\lstinline{actors}, and \lstinline{jython} (last two are only in ScalaBench).
+Both suites were run with \lstinline{--novalidation} parameter to tighten the workload loop.
 
-Description of what they do. Either reference them and describe few that we will pick later.
+All Java benchmarks were run in OpenJDK 11.0.11 JVM with fixed heap size and disabled garbage collection, other virtual machine settings were left at their defaults.
 
-\subsection{Benchmark Configuration}
-\label{sec:benchmark_configuration}
+Spec CPU 2017 is sole non-Java benchmark --- representative of natively compiled C, C++, and Fortran benchmarks.
+We run its rate workloads in peak tuning using the \lstinline{onlyrun} action\footnote{Disclaimer: Spec CPU prohibits publications of results without verification, but for our use-case verification could affect our results negatively, and we don't report SpecCPU score just use the iteration durations.} that skips additional non-workload steps.
+Spec CPU was not intended to run in container and hence we faced multiple issues setting it up.
+From build and training errors in installation step (\lstinline{503.bwaves_r}, \lstinline{510.parest_r}, \lstinline{521.wrf_r}, \lstinline{527.cam4_r}) to runtime memory requirements (\lstinline{502.gcc_r}, \lstinline{523.xalancbmk_r}, \lstinline{526.blender_r}).
+Overall we run 14 benchmarks from Spec CPU 2017.
 
-Describe how were the benchmarks configured (1) heap parameters (2) validation checks and other options passed to suite harnesses.
-Note that SPECcpu prohibits publication of results without verification but reason why this is the case.
+\subsection{Docker setup}
+Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}~\footnote{\url{https://hub.docker.com/r/renaissancebench/buildenv}}, Scalabench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}~\footnote{\url{https://hub.docker.com/_/openjdk}} image but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
+Docker image for SpecCPU is based on \lstinline{ubuntu} image and the whole suite installation is done in the container build step using configuration with \lstinline{gcc}, full configuration is available in attached source code.
 
-\subsection{Selected platforms}
-
-Describe what platforms were picked, why and what was their configuration.
-\begin{enumerate}
-  \item Dedicated server
-  \item On-prem private cloud - DigitalOcean
-  \item AWS - different configurations
-  \item Personal laptop? - to illustrate usability in general developer workflow
-\end{enumerate}
+Docker containers run with no additional options than mentioned in~\cref{chap:impl} or reservations on CPU or memory.
+There are multiple reasons for this: (1) benchmarks themselves check number of available CPU and set according parallelism, but that information is returned by the OS and thus would same for both duet pairs regardless of docker allocations, (2) the CPU reservations would rule out use of smaller cloud instances, (3) impact symmetry with completely fair scheduler should allocate equal resources to both benchmarks, hence simplifying setup.
 
 \subsection{Run summary}
 
-Number of benchmarks run in different configurations as well as different methods used - asynchronous/synchronous duet, sequential.
+One of the goals of the duet methods is to enable benchmarking in varying environments.
+For that reason our selection of platforms has AWS EC2 \lstinline{t3.medium} instances as cloud representative, dedicated bare metal servers, and self-hosted virtualized environment with no special performance measurement treatment that is actively used by other students.
+AWS \lstinline{t3.medium} instance was chosen because the \lstinline{t2} instances were not powerful enough to run two Spec CPU benchmarks in docker side by side and \lstinline{t3.medium} turned out to be the cheapest alternative able to do so.
+The measurements were parallelized across multiple instances in each environment except for school teaching environment as there is only one instance.
+\Cref{table:envs} summarizes configuration of selected platforms and timeframe of the measurements.
+
+\begin{table}[ht]
+  \centering
+  \resizebox{\textwidth}{!}{\begin{tabular}{llllll}
+  Environment   & Instances & CPU                                                                     & vCPUs & Memory  & Measurements \\
+  \hline
+  AWS t3.medium & 10        & \begin{tabular}[c]{@{}l@{}}Intel(R) Xeon(R) Platinum 8259CL\\
+		                                                 Intel(R) Xeon(R) Platinum 8175M\end{tabular} & 2     & 4.0 GiB & Jul 12 -- Jul 19 2022\\
+  \\
+  Bare metal    & 8         & Intel(R) Xeon(R) CPU E3-1230 v6                                         & 4     & 32 GiB  & \begin{tabular}[c]{@{}l@{}}Jun 17 -- Jun 22 2022\\
+                                                                                                                                                     Dec 8 -- Dec 10 2022\end{tabular}\\
+  \\
+  Teaching      & 1         & Intel(R) Xeon(R) CPU E5-2620 v4                                         & 4     & 16 GiB  & Dec 3 -- Dec 20 2022
+  \end{tabular}}
+  \caption{Summary of selected platforms.}
+  \label{table:envs}
+\end{table}
+
+We ran 20 runs of each benchmark in each environment with every available measurement type.
+The only exception is the "Teaching" environment where we decided not to run Spec CPU due to disk and runtime requirements.
+That sums up to more than 100 days of machine time executing 61 unique benchmarks.
+
+Each benchmark run has been executed for given amount of iterations or until it reached a timeout.
+Timeout for Java based benchmarks was 5 minutes and for Spec CPU it was 30 minutes.
+Iteration limit for renaissance was set to default which is supposed to be reasonable for that type of benchmark.
+Scalabench and DaCapo had hard a limit of 50 iterations while Spec CPU only 10.
+Deep dive on runtime is in the next section.
 
 \section{Measurements}
+\label{sec:measurements}
 
-% Address each research question:
+Following sections provide answers to research questions proposed in~\cref{chap:duet}.
+Often, due to big number of benchmarks we aggregate the results per benchmark by suites or measurement methods.
+For detailed --- per benchmark results look into attached python notebooks described in~\cref{sec:automation}.
+All data in following figures is subject to data preprocessing described in~\cref{sec:data_filtering}, unless stated otherwise.
+
+\subsection{RQ1: Runtime savings}
+\label{sec:rq1}
+
+The first research question is meant to answer whether the duet methods have overall runtime savings compared to sequential method.
+Presumption is that since duets run in concurrently they can be twice as fast as sequential method which runs one by one.
+
+Runtime is computed on raw measurements, from start of particular run to its end. For sequential method since pairs don't run in parallel add duration of pair A and B.
+For duet methods take sooner start and later end of a run to compute the duration.
+\begin{align*}
+runtime^{e, b}_{seqn}  =&~\{end(R^A) - start(R^A) + end(R^B) - start(R^B)~|\\
+                        &~~(R^A, R^B) \in M^{e, b}_{seqn}\} \\
+runtime^{e, b}_{aduet} =&~\{min(start(R^A), start(R^B)) - max(end(R^A), end(R^B))~|\\
+                        &~~(R^A, R^B) \in M^{e, b}_{aduet}\}
+\end{align*}
+
+Then runtime speedup for particular benchmark $b \in B$ in an environment $e \in E$:
+$$
+runtime\_speedup^{e, b} = \frac{mean(runtime^{e, b}_{seqn})}{mean(runtime^{e, b}_{aduet})}.
+$$
+
+\Cref{fig:runtime_speedup} shows what was the runtime speedup of asynchronous duet run.
+As it turns out this is heavily dependent on the environment and on the type of the benchmark.
+Some benchmarks are indeed almost twice as fast especially from Spec CPU suite in stable environments.
+However, there is significant variability and even in bare metal environment some benchmarks show no speedup at all, in cloud duet is even slower for some benchmarks.
+This is likely the cause of vCPU discrepancy as \lstinline{t3.medium} has only $2$ vCPUs while other environments have $4$.
+
+Overall, median speedup is $5\%$, $73\%$, and $53\%$ for cloud, bare-metal, and teaching environments respectively.
+These results show that using duet methods can significantly reduce the machine time required to run benchmarks.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.9\linewidth]{./figures/runtime_speedup.pdf}
+	\caption{
+		Runtime speedup of asynchronous duet method across different environments and suites.
+		This is not subject to data preprocessing from~\cref{sec:data_filtering} as it captures raw measurements time.
+	}
+	\label{fig:runtime_speedup}
+\end{figure}
+
+\subsection{RQ2: Pair overlaps}
+\label{sec:rq2}
+
+Second research question aims to understand the nature of asynchronous duet iteration overlaps.
+However, as stated in~\cref{sec:overlaps} not all overlaps are the same.
+It is especially important for the CI computation from~\ref{sec:ci_test} where minimum overlap rate is used for pairing asynchronous duet iterations.
+Formally, for benchmark $b \in B$ in environment $e \in E$ and minimum overlap ratio $m$
+$$
+relative\_overlap\_time^{e, b}_m = \frac{\sum\limits_{(i^A, i^B) \in O^{e,b}_m} 2 * overlap\_time(i^A, i^B)}{\sum\limits_{(R^A, R^B) \in M^{e, b}_{aduet}}(\sum\limits_{i \in R^A} i + \sum\limits_{i \in R^B} i)}.
+$$
+The overlap time in the nominator is doubled because overlap is symmetric relation and denominator accounts for runtime of both pairs, this way the $relative\_overlap\_time^{e, b}_m \in [0, 1]$ and represents a percentage of overlapping workload runtime, not just a harness.
+
+\Cref{fig:relative_overlap_time} shows how much does minimum overlap rate affect the relative overlap time.
+Spec CPU has very good overlap coverage which suggest low variance of iteration durations.
+Other suites show steady decline as the minimum overlap ratio reaches $90\%$ overlap time is less than $20\%$ of total iteration time hindering the runtime improvements from~\cref{sec:rq1}.
+However, minimum overlap ratio of $30\%$ or $50\%$ retains above $80\%$ or $60\%$ of iteration runtime respectively, which seems like a good fit for the minimum overlap ratio parameter.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/relative_overlap_time.pdf}
+	\caption{
+		Box plot of benchmarks in respective suites that describes how big is the relative overlap time of these benchmarks compared to overall iteration time with different minimum overlap rates.
+	}
+	\label{fig:relative_overlap_time}
+\end{figure}
+
+\xxx{TODO: Include examples of some overlap length distributions. Consider including lag some lag plots that would show synchronized nature of overlaps.}
+
+\subsection{RQ3: Accuracy improvements}
+\label{sec:rq3}
+
+Third research question concerns the accuracy of regression detection using different benchmarking methods across different environments.
+The accuracy is inherently dependent on variance of measurements.
+Therefore, the first method of comparison uses relative standard deviation $CV$ as described in~\cref{sec:cv}.
+
+\Cref{fig:cv} shows $CV$ of different benchmarking methods across different environments for all benchmarks.
+It shows that duet methods have comparable variance and even though sequential method has usually smaller $CV$ all environments there is no significant difference between methods nor environments.
+Spec CPU has the smallest $CV$ which expected since it is the only natively compiled suite with longer runtime.
+Closer look shows common benchmark outliers, namely \lstinline{luindex} in teaching environment in both ScalaBench and DaCapo suites, \lstinline{fop} from DaCapo in teaching and cloud environments, and the \lstinline{dotty} from Renaissance suite in cloud environment which has biggest $CV$ of $0.8$.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/cv.pdf}
+	\caption{
+		Box plot of benchmarks from respective suites and their $CV$ for different benchmarking methods and environments.
+	}
+	\label{fig:cv}
+\end{figure}
+
+Next, we can determine the accuracy of each method using A/A detection correctness of CI test from~\cref{sec:ci_test}.
+As shown in~\cref{sec:rq2} the value of minimum overlap ratio can significantly influence overall overlap time.
+\Cref{fig:citest_overlap_aa} shows success of CI test in determining A/A run based on minimum overlap ratio.
+First important takeaway is that CI test has reasonably good A/A detection capabilities across all environments and even high minimum overlap ratio.
+Synchronous duet in teaching environment comes the off worst with only $70\%$ A/A detection rate closely followed by Spec CPU with only $81\%$.
+Low correctness of the CI test for Spec CPU suite is likely a result of its low variance and small relative CI width as shown in~\cref{fig:ci_width}.
+Based on these findings we set the minimum overlap ratio to $40\%$ in the following CI computations.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/citest_aa_match_by_overlap.pdf}
+	\caption{
+		How does asynchronous duet overlap ratio affect correct A/A run detection using CI test.
+	}
+	\label{fig:citest_overlap_aa}
+\end{figure}
+
+\Cref{fig:ci_width} shows relative CI width~\ref{sec:ci_width}.
+Width of CI compares iteration variance across environments and variance of CI computation in particular.
+It differentiates teaching environment despite the fact that all environments had low $CV$~\ref{fig:cv}.
+Surprisingly, the CI width for cloud environment looks very similar to bare metal measurements.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/ci_width.pdf}
+	\caption{
+		Box plot of benchmarks from respective suites and their relative CI width. 
+		CI for asynchronous duet uses minimum overlap ratio of $40\%$.
+	}
+	\label{fig:suite_cv}
+\end{figure}
+
+\Cref{fig:citest_aa} shows the correctness of CI test across different benchmarking methods and environments.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/citest_aa_match.pdf}
+	\caption{
+		Success of CI test in determining A/A run.
+	}
+	\label{fig:citest_aa}
+\end{figure}
+
+\Cref{fig:utest_aa} shows success of \mbox{u-test} described in~\cref{sec:utest} in determining A/A run.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/utest_aa_match.pdf}
+	\caption{
+		Success of \mbox{u-test} in determining A/A run.
+	}
+	\label{fig:utest_aa}
+\end{figure}
+
+\subsection{RQ4: Minimal detectable slowdowns}
+\label{sec:rq4}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/mds_citest.pdf}
+	\caption{
+    MDS using CI-test.
+	}
+	\label{fig:mds_citest}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/mds_utest.pdf}
+	\caption{
+    MDS using U-test.
+	}
+	\label{fig:mds_utest}
+\end{figure}
+
+\section{Evaluation automation}
+\label{sec:automation}
+
+\xxx{Add a section about how the \lstinline{duetprocess} tool automizes above described evaluation.}

@@ -8,56 +8,114 @@ More so if it has to apply to particular machine experiments are measured on.
 \section{A/A runs}
 
 Therefore, research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
-A/A measurements compares the same versions and later labels runs with A and B labels.
+A/A measurements run the same version and later labels runs with A and B labels - as if there were 2 versions.
 Since the code is the same the performance should be the same as well.
 Different statistical methods such as confidence intervals and hypothesis testing are used to evaluate if performance of A/B labeled runs is the same.
-In the context of duet runs A/B labeling is performed in context of duet pairs.
+In the context of duet runs A/B labeling is performed on concurrently running duet pairs.
 
 \section{Data filtering}
+\label{sec:data_filtering}
 
-Initially, custom best practice is to filter out outliers and warm up runs.
-Outliers are a natural occurrence not only in the cloud environment.
-\citet{laaber2019software} tried to explain some order of magnitude outliers by matching particular measurements to some potentially harmful events.
-Even after discussion with the provider they were not able to explain them.
+In our experiments we removed first half of all iterations per run of Java benchmark to avoid warm-up, same as in~\citet{bulej2020duet}.
+% TODO: \citet{horky2015java} note that detecting warm-ups is difficult \xxx{read what is says about warm up}.
+Additionally, same as in \citet{laaber2019software}, use order of magnitude filtering to remove outliers.
 
-Warmups are typical for managed run time environment such as Java Virtual Machine.
-\citet{horky2015java} note that detecting warm-ups is difficult \xxx{read what is says about warm up}.
+\xxx{TODO: add sentence about how many data points it removed.}
 
-Since both outlier filtering and warm-ups detection are difficult to manage we have decided to use filtering similar to aforementioned papers.
-For example \citet{laaber2019software} decided to remove first 10 out of 25 measurements per run of Java benchmark as warmup.
-They also removed outliers that were order of magnitude different from the rest --- that turned out to be \xxx{1-2\% of measurements in total}.
+\xxx{TODO: describe that we did not remove anything from SpecCPU.}
 
-Similarly, in~\citet{bulej2020duet} authors decided to remove first half of Java measurements per run.
-In this case outliers were removed by windsorization --- replacing at most one observation in a run with its nearest neighbor when that observation is further than $20\%$ away from min-max range of the remaining observations.
+\section{Accuracy analysis and performance regression tests}
 
-In our experiments we remove first half of all Java benchmarks as they are using the same benchmark suites as the ones in~\citet{bulej2020duet}.
-Then apply orders of magnitude ourlier filtering as in~\citet{laaber2019software} to keep the data as representative as possible.
-Outliers turned out to be \xxx{todo \%} of our data set.
+The goal of the benchmarking is to determine performance speedup or a regression.
+High variance of iteration times makes this more difficult, but the synchronous duet method has shown \xxx{variance improvements from XYZ to XYZ}~\citet{bulej2020duet}.
+To address the variance of benchmarking methods, using containers, across different environments (\emph{RQ3}), we use various statistical methods.
 
-\section{Variance analysis}
+\subsection{Relative standard deviation}
+\label{sec:cv}
 
+Relative standard deviation, also known as coefficient of variation ($CV$), is one way to determine the variance of iteration times.
+For measurement type $t \in T$, benchmark $b \in B$, runs $R^{t, b} \in M^e$:
+\begin{align*}
+CV^{t, b} &= \frac{std(R^{t, b})}{mean(R^{t, b})} = \frac{std(\{i~|~i \in R^{t, b}\})}{mean(\{i~|~i \in R^{t, b}\})}
+\end{align*}
 
-\subsection{Variance of single result distribution}
+The $CV$ is a measure of how results of different benchmarks vary relative to each other using different benchmarking methods.
+However, the variance of duet methods cannot be determined just based on $CV$.
 
-\subsection{Variance of a duet run}
+For instance, higher $CV$ for given benchmark's duet measurements compared to its sequential measurements don't imply worse predictability of duet methods because of the impact symmetry argument.
+Overall variance might be higher, but pairwise comparison could be more telling.
+On the other hand, lower $CV$ for duet methods suggests better robustness of duet methods.
 
-\subsubsection{Synchronous duet}
+\subsection{Confidence interval test}
+\label{sec:ci_test}
 
-\subsubsection{Asynchronous duet}
+To determine if pairs manifest performance change use method of confidence intervals from~\citet{bulej2020duet}.
+This method also provides a variance comparison across benchmarking methods based on relative confidence interval width.
+Here, we describe the method and extend its use for asynchronous duet.
 
-\subsection{Comparing variance between measurement methods}
+First, runs and their iterations need to be paired.
+\begin{description}
+    \item[Sequential] runs don't have any natural pairing, runs are randomly paired by the nature of A/A runs labeling. We decided to pair their iterations sequentially.
+    \item[Synchronous duet] runs are naturally paired - sequentially by iterations.
+    \item[Asynchronous duet] runs can't be paired sequentially.
+        Considering A/B measurements, non-synchronized iterations will inevitably diverge, hence sequential iteration pairing wouldn't support impact symmetry.
+        Instead, we decided to pair iterations $i^A$ and $i^B$ based on the minimum overlap rate $m \in (0, 1)$ and thus define a set of filtered overlaps as
+        $$
+        O^{e,b}_m = \{(i^A, i^B)~|~(i^A, i^B) \in O^{e, b}, overlap\_rate(i^A, i^B) > m\}.
+        $$
+        The smaller the $m$, the fewer pairs of iterations there will be and vice versa.
+        Analysis of how many overlaps there are for different $m$s is in~\cref{sec:rq2}.
+\end{description}
+Each pairing method returns set of paired iterations for given experiment $M^{e, b}_t$,
+$$
+Pairs(M^{e, b}_t) = \{(i^A, i^B)~|~is\_pair(i^A, i^B),~\forall~i^A, i^B \in M^{e, b}_t\}.
+$$
 
-\subsubsection{Confidence intervals}
+Second, paired iteration times are subtracted to determine difference between all pairs which yields random sample $X$ with distribution $F_X$
+$$
+X = \{i^A - i^B~|~(i^A, i^B)~\in~Pairs(M^{e, b}_t)\}.
+$$
 
-\subsubsection{Hypothesis testing}
+Furthermore, \citet{bulej2017stat} recommend to use \emph{run means} sampling instead of \emph{runs merged} sampling.
+Runs merged method uses all paired iterations from all runs as a sample.
+Run means, on the other hand, aggregates paired iterations in a paired run using some statistics e.g. arithmetic mean and uses those as samples.
+Given $r$ runs each with $i$ iterations \emph{runs merged} results in $r * i$ observations and \emph{run means} results in $r$ observations.
+
+These observations are used to create $95\%$ confidence interval using non-parametric bootstrap with $9999$ draws with replacement and arithmetic mean as statistics.~\footnote{We used bootstrap method from python \lstinline{scipy} package \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html} that uses bias-corrected and accelerated method to compute the CI by default.}
+For A/A runs we expect distribution $F_X$ to be centered around~$0$.
+Therefore, if confidence interval encompasses~$0$, we consider the workloads equal, otherwise report a difference.
+ 
+\subsubsection{Variability comparison using CI}
+\label{sec:ci_width}
+
+Another use of these confidence intervals is to compute their relative width and compare variance of different measurement methods~\cite{bulej2019initial}.
+$$
+CI_{relative\_width}(X) = \frac{CI_{width}(X)}{mean(X)}.
+$$
+
+\subsection{Mann-Whitney u-test}
+\label{sec:utest}
+
+Next method to evaluate regression in A/B run is to use hypothesis testing.
+One such test used for purpose of A/B performance evaluation is Mann-Whitney \mbox{u-test}~\cite{bulej2017stat,laaber2019software}.
+It is a non-parametric test of the null hypothesis that two samples come from the same distribution.
+One sample is iteration durations of pair A and the other is of pair B.
+
+We used \mbox{u-test} implementation from \lstinline{scipy} python package~\footnote{\url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html}} in its two-sided variant and decide to reject the null hypothesis if \mbox{p-value} is less than $5\%$.
+Hence, if \mbox{p-value} is below $5\%$ for given benchmark, test method, and environment reject the null hypothesis --- sample distributions are distinct enough, thus we report a performance change.
+
+\xxx{Consider using parametrized mann-whitney to determine $x\%$ slowdown.}
 
 \section{Minimal detectable slowdown}
 \label{sec:mds}
 
-Same as in~\citet{laaber2019software}, caveats with the overlaps.
+%Same as in~\citet{laaber2019software}, caveats with the overlaps.
+\Citet{laaber2019software} explore the minimal detectable slowdowns (MDS) for sequential micro-benchmarking method to determine which micro-benchmarks are viable for cloud benchmarking.
+We use this method to determine viability of duet methods compared to sequential methods in the cloud environment.
 
-\subsection{Emulating slowdown}
+First, A/A test results need to be adjusted --- emulate a scenario where pair B is $c$ times wlog slower --- emulating A/B test results where version B has a performance regression.
+For all iterations running version B, multiply its runtime by $c$.
+For asynchronous duet increased iteration times of B affect overlap of A and B.
+Thus we need to recompute the start and end timestamps of each B's iteration, assuming the gaps in between workload runs remain unchanged.
 
-\subsection{Overlapping confidence intervals}
-
-\subsection{Mann-Whiteney U-test}
+Second, use either CI test or Mann-Whitney u-test to determine if adjusted A/B measurements show performance regression on different known slowdowns.

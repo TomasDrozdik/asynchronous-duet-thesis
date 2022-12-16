@@ -1,4 +1,5 @@
 \chapter{Implementation}
+\label{chap:impl}
 
 We implemented a super-harness that takes an existing benchmark harness as an input and executes its benchmarks in the asynchronous duet style.
 
@@ -20,20 +21,21 @@ We refer to this process is as a \emph{run} and it is analogous to a \emph{trial
 For duet methods one \emph{run} executes 2 benchmarks in parallel.
 
 \begin{figure}
-	\centering
-	\includegraphics[width=\linewidth]{./figures/duetbench-sequence.drawio.pdf}
-	\caption{
+    \centering
+    \includegraphics[width=\linewidth]{./figures/duetbench-sequence.drawio.pdf}
+    \caption{
         UML sequence diagram of how \lstinline{duetbench} executes a single A/B asynchronous duet benchmark.
         All the parameters in angled brackets are specified in the configuration file \lstinline{duet.yml} described in~\cref{sec:configuration}.
         Note that the docker commands are simplified for brevity.
-	}
-	\label{fig:duetbench_sequence}
+    }
+    \label{fig:duetbench_sequence}
 \end{figure}
 
 If there are more benchmarks to execute pick the next one (according a particular scheduling strategy, see~\cref{sec:scheduling}) and do the same process.
 In the case of the sequential method, the process is very much the same just omit the second container entirely and run them separately.
 
 \subsection{Synchronized duet in containerized environment}
+\label{sec:sync_duet_impl}
 
 \citet{bulej2020duet} uses shared-memory barrier to synchronize benchmark iterations.
 We ported this solution into the containers to mimic the original behavior.
@@ -134,50 +136,65 @@ To describe parsed results more formally and describe terminology from the \lsti
         Set of environments $E$ used in our experiments is described in~\cref{sec:experiment_setup}.
     \item[Type] $t \in T$ is the measurement method type where $T = \{seqn, sduet, aduet\}$ for sequential, synchronous duet and asynchronous duet respectively.
     \item[Pair] $p \in P$ is version of tested software in case of A/B runs $P = \{A, B\}$
-    \item[Benchmark] $b \in B$ is a benchmark from a benchmark suite, formally $B = \{(suite, benchmark) | suite \in Suites, benchmark \in suite\}$
-    \item[Run] in environment $e \in E$, of type $t \in T$, running benchmark $b \in B$ and pair $p \in P$ is denoted as $R^{e, t, b, p}$.
-        It is a unit that \lstinline{duetbench} works with and can repeat multiple times.
-    \item[Iteration] of a run $R^{e, t, b, p}$ with $iters$ iterations is an ordered set $(i_1, i_2, \dots i_{iters})$ of scores of particular benchmark --- execution time in nanoseconds.
-        The duration of an iteration is a data point of an experiment.
+    \item[Benchmark] $b \in B$ is a benchmark from a benchmark suite, formally $B = \{(suite, benchmark)~|~benchmark \in suite \}$
+    \item[Run] in environment $e \in E$ of type $t \in T$ running benchmark $b \in B$ and pair $p \in P$ is denoted as $R^{e, t, b, p}$.
+        It is a unit that \lstinline{duetbench} works with and can run multiple times.
+    \item[Iterations] of a run $R^{e, t, b, p}$ with $iters$ iterations is an ordered set $(i_1, i_2, \dots i_{iters})$ of scores of particular benchmark --- execution time in nanoseconds.
 \end{description}
 
-To compare runs between environments we won't mix results from different environments and refer to an experiment $M^e$ in an environment $e \in E$ with some number of runs $runs$ per benchmark as set of runs:
-\[M^e = \{R^{t, b, p}_r | t \in T, b \in B, p \in P \forall r \in \{1 \dots runs\}\}\]
+To distinguish different measurement methods for some benchmark $b \in B$ in an environment $e \in E$ denote a set of all sequential runs as
+\begin{align*}
+M^{e, b}_{seqn} &= \{(R^{e, seqn, b, A}_r,~R^{e, seqn, b, B}_r)~|~\forall r \in \{1 \dots runs\}\},
+\end{align*}
 
-To distinguish different measurement methods for some benchmark $b \in B$, denote a set of all sequential runs as
-\[R^{seqn, b} = \{R^{t, b, p}_r | t = seqn, p \in P \forall r \in \{1 \dots runs\}\}\]
 set of all synchronized duet measurements which are naturally paired on the level of pairs and iterations as
 \begin{align*}
-R^{sduet, b} &= \{(R^{t, b, A}_r, R^{t, b, B}_r) | t = sduet, p \in P \forall r \in \{1 \dots runs\}\} \\
-             &= \{((i^A_j, i^B_j)_r) | \forall r \in \{1 \dots runs\}, \forall j \in \{1 \dots iters\}\}
+M^{e, b}_{sduet} &= \{(R^{e, sduet, b, A}_r,~R^{e, sduet, b, B}_r)~|~\forall r \in \{1 \dots runs\}\}\\
+                 &= \{(i^A_j,~i^B_j)_r~|~\forall r \in \{1 \dots runs\},~\forall j \in \{1 \dots iters\}\},
 \end{align*}
-and finaly set of all asynchronous duet measurements, naturally paired on the level of pairs as
-\[R^{aduet, b} = \{(R^{t, b, A}_r, R^{t, b, B}_r) | t = aduet \forall r \in \{1 \dots runs\}\}\]
+
+and finally set of all asynchronous duet measurements, naturally paired on the level of pairs as
+\begin{align*}
+M^{e, b}_{aduet} &= \{(R^{e, aduet, b, A}_r,~R^{e, aduet, b, B}_r)~|~\forall r \in \{1 \dots runs\}\}.
+                 %&= \{((i_j)^A,~(i_j)^B)_r~|~~r \in \{1 \dots runs\},~j \in \{1 \dots iters\}\},
+\end{align*}
+
+Finally, refer to $M^e$ as the union of all runs in an environment $e \in E$
+$$
+M^e = \{ M^{e, b}_{seqn} \cup M^{e, b}_{sduet} \cup M^{e, b}_{aduet} ~|~ b \in B \}.
+$$
+
 
 \subsection{Overlaps}
 \label{sec:overlaps}
 
 To address \emph{RQ2} \lstinline{duetprocess} provides a method to compute overlaps of iterations of given asynchronous duet run.
-Let $(R_A, R_B) \in R^{aduet, b}$ represent asynchronous duet A/B runs of some benchmark $b \in B$.
-Iterations of respective run are $R_A = (i^A_1 \dots i^B_{iters})$ and $R_B = (i^A_1 \dots i^B_{iters})$.
-Then an overlap of these two runs $O_{R_A, R_B}$ can be expressed as:
+Let $(R^A, R^B) \in M^{e, b}_{aduet}$.
+Iterations of respective runs are $R^A = (i^A_1 \dots i^A_{iters})$ and $R^B = (i^B_1 \dots i^B_{iters})$.
+To define iteration overlaps the following notation is used:
 \begin{align*}
-start(i) &= \text{start of iteration }i \\
-end(i) &= \text{end of iteration } i \\
-overlap\_start(i_1, i_2) &= max(start(i_1), start(i_2)) \\
-overlap\_end(i_1, i_2) &= min(end(i_1), end(i_2)) \\
-O_{R_A, R_B} =& \{(i^A_i, i^B_j) | overlap\_start(i^A_i, i^B_j) < overlap\_end(i^A_i, i^B_j) \\
-              &\forall i \in \{1 \dots iters\}, \forall j \in \{1 \dots iters\}\} \\
+start(i) &= \text{start of iteration } i,\\
+end(i) &= \text{end of iteration } i,\\
+overlap\_start(i^A, i^B) &= max(start(i^A), start(i^B)),\\
+overlap\_end(i^A, i^B) &= min(end(i^A), end(i^B)).
+\end{align*} 
+Then set of overlaps of these two runs $O_{R^A, R^B}$ can be expressed as
+\begin{align*}
+O_{R^A, R^B} =&~\{(i^A_j, i^B_k)~|~overlap\_start(i^A_j, i^B_k) < overlap\_end(i^A_j, i^B_k),\\
+              &~~\forall j \in \{1 \dots iters\}, \forall k \in \{1 \dots iters\}\}.
 \end{align*} 
 
 However, not all overlaps are equally important.
 As shown in~\cref{fig:overlap_timeline} and \emph{RQ2} introduction some overlaps might be tiny and cover start of one iteration with the end of another.
 Following notations are used to express quality of an overlap:
-
-\xxx{TODO: add weighted overlaps versions}
 \begin{align*}
-overlap\_time(i_1, i_2) &= overlap\_end(i^1_i, i^2_j) - overlap\_start(i^1_i, i^2_j) \\
+overlap\_time(i^A, i^B) &= overlap\_end(i^A, i^B) - overlap\_start(i^A, i^B), \\
+overlap\_rate^A(i^A, i^B) &= \frac{overlap\_time(i^A, i^B)}{i^A}, \\
+overlap\_rate^B(i^A, i^B) &= \frac{overlap\_time(i^A, i^B)}{i^B}, \\
+overlap\_rate(i^A, i^B) &= min(overlap\_rate^A(i^A, i^B), overlap\_rate^B(i^A, i^B)).
 \end{align*}
 
-A set of all overlaps $O^{M^e}$ of an experiment $M^e$ is
-\[O^{M^e} = \{(O_{R_A, R_B}) | (R_A, R_B) \in R^{aduet, b} \forall b \in B \}\]
+Denote a set of all asynchronous duet overlaps for a benchmark $b \in B$ in an environment $e \in E$ as
+$$
+O^{e,b} = \{O_{R^A, R^B}~|~(R^A, R^B) \in M^{e,b}_{aduet}\}.
+$$
