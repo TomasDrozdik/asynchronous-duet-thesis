@@ -167,7 +167,9 @@ Closer look shows common benchmark outliers, namely \lstinline{luindex} in teach
 Next, we can determine the accuracy of each method using A/A detection correctness of CI test from~\cref{sec:ci_test}.
 As shown in~\cref{sec:rq2} the value of minimum overlap ratio can significantly influence overall overlap time.
 \Cref{fig:citest_overlap_aa} shows success of CI test in determining A/A run based on minimum overlap ratio.
-First important takeaway is that CI test has reasonably good A/A detection capabilities across all environments and even high minimum overlap ratio.
+First important takeaway is that CI test has reasonably good A/A detection capabilities across all environments.
+However, steep rises or declines imply that multiple benchmarks in given suite were on the edge of CI straddling $0$ which is expected at higher values of minimum overlap ratio decrease the overlap runtime significantly~\ref{fig:relative_overlap_time}.
+
 Synchronous duet in teaching environment comes the off worst with only $70\%$ A/A detection rate closely followed by Spec CPU with only $81\%$.
 Low correctness of the CI test for Spec CPU suite is likely a result of its low variance and small relative CI width as shown in~\cref{fig:ci_width}.
 Based on these findings we set the minimum overlap ratio to $40\%$ in the following CI computations.
@@ -177,6 +179,7 @@ Based on these findings we set the minimum overlap ratio to $40\%$ in the follow
 	\includegraphics[width=1\linewidth]{./figures/citest_aa_match_by_overlap.pdf}
 	\caption{
 		How does asynchronous duet overlap ratio affect correct A/A run detection using CI test.
+		Not that each suite has different no so big amount of benchmarks.
 	}
 	\label{fig:citest_overlap_aa}
 \end{figure}
@@ -196,7 +199,9 @@ Surprisingly, the CI width for cloud environment looks very similar to bare meta
 	\label{fig:suite_cv}
 \end{figure}
 
-\Cref{fig:citest_aa} shows the correctness of CI test across different benchmarking methods and environments.
+Overall results of the CI test are in \Cref{fig:citest_aa}.
+CI test achieves the best results in the cloud environment but overall correctness of A/A detection straddles $80\%$.
+One particular thing to point out is that sequential method is not worse than duet methods and sometimes even outperforms duet methods.
 
 \begin{figure}
 	\centering
@@ -208,6 +213,8 @@ Surprisingly, the CI width for cloud environment looks very similar to bare meta
 \end{figure}
 
 \Cref{fig:utest_aa} shows success of \mbox{u-test} described in~\cref{sec:utest} in determining A/A run.
+The \mbox{u-test} seems to be doing much worse compared to the CI test in bare-metal environment in particular.
+However, it has $100\%$ success rate on the Spec CPU suite in cloud environment for both sequential and asynchronous duet methods.
 
 \begin{figure}
 	\centering
@@ -221,6 +228,16 @@ Surprisingly, the CI width for cloud environment looks very similar to bare meta
 \subsection{RQ4: Minimal detectable slowdowns}
 \label{sec:rq4}
 
+The last research question regards minimal detectable slowdowns (MDS).
+First, the results have to be adjusted as described in~\cref{sec:mds}.
+Then evaluate regression detection capabilities using CI test and \mbox{u-test}, with no slowdown the values are the same as in~\cref{fig:citest_aa} and~\cref{fig:utest_aa} for CI test and \mbox{u-test} respectively.
+The bigger the slowdown the sooner the A/A match should drop to $0\%$ --- no benchmarks were considered equal in performance.
+
+\Cref{fig:mds_citest} shows MDS using the CI-test.
+The Spec CPU has MDS of $1\%$ slowdown for both benchmarking methods and in both environments but its initial A/A detection is only at $\textasciitilde 80\%$.
+Rest of the benchmarks have fairly similar trends of MDS with sequential method sometimes lacking slightly behind duet methods.
+Overall almost all benchmarks have MDS of $5\%$.
+
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/mds_citest.pdf}
@@ -230,11 +247,14 @@ Surprisingly, the CI width for cloud environment looks very similar to bare meta
 	\label{fig:mds_citest}
 \end{figure}
 
+Since \mbox{u-test} showed reasonable A/A detection rate only for Spec CPU benchmark we showcase MDS for this suite only in~\cref{fig:mds_utest}.
+Similar to CI test, \mbox{u-test} it is able to detect $1\%$ slowdown for the whole Spec CPU suite.
+
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/mds_utest.pdf}
 	\caption{
-    MDS using U-test.
+    MDS using \mbox{u-test}.
 	}
 	\label{fig:mds_utest}
 \end{figure}
