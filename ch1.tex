@@ -21,7 +21,7 @@ If the benchmark code gets bigger it is usually referred to as application bench
 Benchmarks do not have the sole purpose of measuring the performance of an application, inversely they provide a way to measure the capabilities of some hardware.
 For this reason, many benchmark suites aggregate many application workloads, put them under a single harness, and simplify the performance evaluation process.
 Examples of such suites are from Standard Performance Evaluation Corporation (SPEC) SPECcpu \footnote{SPEC CPU® 2017 \url{https://www.spec.org/cpu2017/}} and SPECjbb \footnote{SPECjbb® 2015 \url{https://www.spec.org/jbb2015/}}.
-Other standalone suites used in this thesis are Renaissance~\cite{prokopec2019renaissance}, Dacapo \footnote{DaCapo Benchmarks \url{https://dacapo-bench.org/}}, and Scalabench \footnote{Scala Benchmarking Project \url{https://www.scalabench.org/}} suite.
+Other standalone suites used in this thesis are Renaissance~\cite{prokopec2019renaissance}, DaCapo \footnote{DaCapo Benchmarks \url{https://dacapo-bench.org/}}, and ScalaBench \footnote{Scala Benchmarking Project \url{https://www.scalabench.org/}} suite.
 All above-mentioned suites are Java-based except for SPECcpu which has benchmarks written in C, C++, and Fortran and hence is natively compiled.
 Apart from testing hardware performance, benchmark suites are good candidates for research in performance measurement methods as they strive to provide a wide range of real-world representative workloads.
 
@@ -76,7 +76,7 @@ The main idea is to run both versions of software in parallel assuming that any 
 The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
 
 % Why ease of the synchronous restriction makes sense?
-The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2022duet}.
+The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for ScalaBench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2022duet}.
 However, duet benchmarking came with its complexities, predominantly that the method requires synchronized iterations of two harnesses running in parallel.
 To use the duet method on mentioned benchmark suites, authors had to modify these suites --- add iteration synchronization capability via a shared memory barrier.
 To broaden the use case of this method this thesis explores the viability of the relaxed duet method which omits the synchronized iteration requirement.

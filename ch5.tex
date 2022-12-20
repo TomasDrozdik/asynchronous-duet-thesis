@@ -14,8 +14,8 @@ Latter three are also part of~\citet{bulej2020duet} and two of those --- ScalaBe
 Renaissance benchmark suite was selected as modern JVM suite with focus on parallel workloads among others\cite{prokopec2019renaissance}.
 We used version $0.13$ and had to exclude \lstinline{neo4j-analytics} benchmark as it failed to execute on our configuration.
 
-ScalaBench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have significant overlap in benchmarks but are the only once that have their runtime altered to run synchronous duet.
-For DaCapo and ScalaBench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat},\lstinline{actors}, and \lstinline{jython} (last two are only in ScalaBench).
+ScalaBench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have significant overlap in benchmarks but are the only ones that have their runtime altered to run synchronous duet.
+For DaCapo and ScalaBench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat}, \lstinline{actors}, and \lstinline{jython} (last two are only in ScalaBench).
 Both suites were run with \lstinline{--novalidation} parameter to tighten the workload loop.
 
 All Java benchmarks were run in OpenJDK 11.0.11 JVM with fixed heap size and disabled garbage collection, other virtual machine settings were left at their defaults.
@@ -27,16 +27,21 @@ From build and training errors in installation step (\lstinline{503.bwaves_r}, \
 Overall we run 14 benchmarks from Spec CPU 2017.
 
 \subsection{Docker setup}
-Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}~\footnote{\url{https://hub.docker.com/r/renaissancebench/buildenv}}, Scalabench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}~\footnote{\url{https://hub.docker.com/_/openjdk}} image but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
+Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}~\footnote{\url{https://hub.docker.com/r/Renaissancebench/buildenv}}, ScalaBench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}~\footnote{\url{https://hub.docker.com/_/openjdk}} image, but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
 Docker image for SpecCPU is based on \lstinline{ubuntu} image and the whole suite installation is done in the container build step using configuration with \lstinline{gcc}, full configuration is available in attached source code.
 
-Docker containers run with no additional options than mentioned in~\cref{chap:impl} or reservations on CPU or memory.
-There are multiple reasons for this: (1) benchmarks themselves check number of available CPU and set according parallelism, but that information is returned by the OS and thus would same for both duet pairs regardless of docker allocations, (2) the CPU reservations would rule out use of smaller cloud instances, (3) impact symmetry with completely fair scheduler should allocate equal resources to both benchmarks, hence simplifying setup.
+Docker containers run with no additional options than mentioned in~\cref{chap:impl}.
+In particular, there are no reservations on CPU or memory.
+There are multiple reasons for this (1) benchmarks themselves check number of available CPU and set according parallelism, but that information is returned by the OS and thus would same for both duet pairs regardless of docker allocations, (2) the CPU reservations would rule out use of smaller cloud instances, (3) impact symmetry with completely fair scheduler should allocate equal resources to both benchmarks, hence simplifying setup.
 
 \subsection{Run summary}
 
-One of the goals of the duet methods is to enable benchmarking in varying environments.
-For that reason our selection of platforms has AWS EC2 \lstinline{t3.medium} instances as cloud representative, dedicated bare metal servers, and self-hosted virtualized environment with no special performance measurement treatment that is actively used by other students.
+One of the goals of the duet methods is to enable benchmarking in varying environments:
+\begin{description}
+	\item[cloud] environments is represented by AWS EC2 \lstinline{t3.medium} instances,
+	\item[bare-metal] environment consist of dedicated bare metal servers,
+	\item[teaching] environment is self-hosted virtualized environment with no special performance measurement treatment that is actively used by other students.
+\end{description}
 AWS \lstinline{t3.medium} instance was chosen because the \lstinline{t2} instances were not powerful enough to run two Spec CPU benchmarks in docker side by side and \lstinline{t3.medium} turned out to be the cheapest alternative able to do so.
 The measurements were parallelized across multiple instances in each environment except for school teaching environment as there is only one instance.
 \Cref{table:envs} summarizes configuration of selected platforms and timeframe of the measurements.
@@ -59,13 +64,13 @@ The measurements were parallelized across multiple instances in each environment
 \end{table}
 
 We ran 20 runs of each benchmark in each environment with every available measurement type.
-The only exception is the "Teaching" environment where we decided not to run Spec CPU due to disk and runtime requirements.
+The only exception is the teaching environment where we decided not to run Spec CPU due to disk and runtime requirements.
 That sums up to more than 100 days of machine time executing 61 unique benchmarks.
 
 Each benchmark run has been executed for given amount of iterations or until it reached a timeout.
 Timeout for Java based benchmarks was 5 minutes and for Spec CPU it was 30 minutes.
-Iteration limit for renaissance was set to default which is supposed to be reasonable for that type of benchmark.
-Scalabench and DaCapo had hard a limit of 50 iterations while Spec CPU only 10.
+Iteration limit for Renaissance was set to default which is supposed to be reasonable for that type of benchmark.
+ScalaBench and DaCapo had hard a limit of 50 iterations while Spec CPU only 10.
 Deep dive on runtime is in the next section.
 
 \section{Measurements}
@@ -168,9 +173,9 @@ Next, we can determine the accuracy of each method using A/A detection correctne
 As shown in~\cref{sec:rq2} the value of minimum overlap ratio can significantly influence overall overlap time.
 \Cref{fig:citest_overlap_aa} shows success of CI test in determining A/A run based on minimum overlap ratio.
 First important takeaway is that CI test has reasonably good A/A detection capabilities across all environments.
-However, steep rises or declines imply that multiple benchmarks in given suite were on the edge of CI straddling $0$ which is expected at higher values of minimum overlap ratio decrease the overlap runtime significantly~\ref{fig:relative_overlap_time}.
+However, steep rises or declines imply that multiple benchmarks in given suite were on the edge of CI straddling $0$ which is expected as higher values of minimum overlap ratio decrease the overlap runtime significantly~\ref{fig:relative_overlap_time}.
 
-Synchronous duet in teaching environment comes the off worst with only $70\%$ A/A detection rate closely followed by Spec CPU with only $81\%$.
+ScalaBench in teaching environment comes the off worst with only $70\%$ A/A detection rate closely followed by Spec CPU with only $81\%$.
 Low correctness of the CI test for Spec CPU suite is likely a result of its low variance and small relative CI width as shown in~\cref{fig:ci_width}.
 Based on these findings we set the minimum overlap ratio to $40\%$ in the following CI computations.
 
@@ -196,7 +201,7 @@ Surprisingly, the CI width for cloud environment looks very similar to bare meta
 		Box plot of benchmarks from respective suites and their relative CI width. 
 		CI for asynchronous duet uses minimum overlap ratio of $40\%$.
 	}
-	\label{fig:suite_cv}
+	\label{fig:ci_width}
 \end{figure}
 
 Overall results of the CI test are in \Cref{fig:citest_aa}.
@@ -234,7 +239,7 @@ Then evaluate regression detection capabilities using CI test and \mbox{u-test},
 The bigger the slowdown the sooner the A/A match should drop to $0\%$ --- no benchmarks were considered equal in performance.
 
 \Cref{fig:mds_citest} shows MDS using the CI-test.
-The Spec CPU has MDS of $1\%$ slowdown for both benchmarking methods and in both environments but its initial A/A detection is only at $\textasciitilde 80\%$.
+The Spec CPU has MDS of $1\%$ slowdown for both benchmarking methods and in both environments but its initial A/A detection is only at approximately $80\%$.
 Rest of the benchmarks have fairly similar trends of MDS with sequential method sometimes lacking slightly behind duet methods.
 Overall almost all benchmarks have MDS of $5\%$.
 
