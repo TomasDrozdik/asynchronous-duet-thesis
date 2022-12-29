@@ -116,7 +116,7 @@ We use this method to determine viability of duet methods compared to sequential
 First, A/A test results need to be adjusted --- emulate a scenario where pair B is $s$ times wlog slower --- emulating A/B test results where version B has a performance regression.
 For all iterations running version B, multiply its runtime by $s$.
 $$
-\forall e \in E ~ \forall (R^A, R^B) \in M^{e} ~:~ R^B_{slowed} = \{i * s~|~\forall i \in R^B \}.
+\forall (R^A, R^B) \in M^{e} ~:~ R^B_{slowed} = \{i * s~|~\forall i \in R^B \}.
 $$\
 For asynchronous duet increased iteration times of B affect overlap of A and B.
 Thus we need to recompute the start and end timestamps of each B's iteration, assuming the gaps in between workload runs remain unchanged.

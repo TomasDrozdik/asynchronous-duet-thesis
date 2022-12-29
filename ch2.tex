@@ -26,7 +26,7 @@ As this speedup is crucial for time and monetary reasons, we will investigate it
 A research question we would like to see answered is therefore:
 
 \begin{quote}
-	\textbf{RQ1:} \emph{What are the runtime savings of duet methods compared to the sequential method?}
+	\textbf{RQ1:} \emph{What are the runtime savings of asynchronous duet method compared to the sequential method?}
 \end{quote}
 
 % Mutual interference
@@ -137,9 +137,17 @@ Additionally, using a similar approach to~\citet{laaber2019software} asynchronou
 \end{quote}
 
 % Why is it important - runtime reduction, variable environment, no suite modification
-To summarize research into duet methods this thesis focuses on:
+\section{Goals}
+\label{sec:goals}
+
+To summarize, these are the areas of focus for this thesis:
 \begin{description}
-	\item[Runtime and Cost reduction] Duet methods have the potential to drastically reduce, up to $50\%$, the execution time of benchmarks.
-	\item[Accuracy] Synchronized duet method can reduce the variance of benchmark results measured in a variable environment, such as a public cloud~\citet{bulej2020duet}. The question is if the asynchronous duet can do the same?
-	\item[Accessibility] Asynchronous duet relaxes the synchronized requirement on benchmark harnesses which makes this method more broadly usable.
+	\item[Accessibility]
+		Asynchronous duet relaxes the synchronized iteration requirement on benchmark harnesses imposed by synchronized duet method.
+		Our goal is to create a generic benchmark super-harness for running benchmarks from various suites using sequential and duet methods and automate the result processing.
+	\item[Runtime and Cost reduction]
+		Duet methods have the potential to drastically reduce, up to $50\%$, the execution time of benchmarks (RQ1).
+	\item[Accuracy]
+		Synchronized duet method can reduce the variance of benchmark results measured in a variable environment, such as a public cloud~\cite{bulej2020duet}.
+		The question is if the asynchronous duet can do the same (RQ2, RQ3, RQ4)?
 \end{description}

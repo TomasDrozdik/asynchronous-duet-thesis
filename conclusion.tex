@@ -1,10 +1,69 @@
 
 \chapwithtoc{Conclusion}
 
-In the conclusion, you should summarize what was achieved by the thesis. In a few paragraphs, try to answer the following:
-\begin{itemize}
-\item Was the problem stated in the introduction solved? (Ideally include a list of successfully achieved goals.)
-\item What is the quality of the result? Is the problem solved for good and the mankind does not need to ever think about it again, or just partially improved upon? (Is the incompleteness caused by overwhelming problem complexity that would be out of thesis scope\todo{This is quite common.}, or any theoretical reasons, such as computational hardness?)
-\item Does the result have any practical applications that improve upon something realistic?
-\item Is there any good future development or research direction that could further improve the results of this thesis? (This is often summarized in a separate subsection called `Future work'.)
-\end{itemize}
+Our main goal was to evaluate the behavior of a new duet method variant which does not synchronize iterations.
+Particularly we wanted to answer questions from~\cref{sec:goals}.
+
+% Was the problem stated in the introduction solved? (Ideally include a list of successfully achieved goals.)
+%% Accessibility
+First of which was better accessibility of duet methods.
+We achieved that by creating a benchmark super-harness tool that can run benchmarks from multiple suites in a portable containerized way using both sequential and duet methods.
+This tool was used to run measurements in cloud, bare-metal and shared virtual machine environments.
+
+%% Runtime and cost reduction
+Second goal focused on runtime reduction potential of duet methods.
+\Cref{sec:rq1} shows that most of the natively compiled and longer running benchmarks from SPEC CPU suite ran $80 - 100\%$ faster when using asynchronous duet method compared to using sequential method reducing the costs by up to $50\%$.
+But results varied across benchmarks suites and environments.
+Cloud environment in particular did not do well in runtime speedups and even manifested a slowdown for some benchmarks.
+Though this was likely caused by cloud instances having 2 vCPUs while other environments had 4.
+Overall average speedups were $8\%$, $60\%$ and $54\%$ for cloud, \mbox{bare-metal} and \mbox{shared-vm} environments respectively.
+
+% Accuracy
+Third and last goal focused on accuracy of asynchronous duet method.
+Initially we looked at the way asynchronous iterations overlap in~\cref{sec:rq2}.
+Overlap quality was determined by the proportion of overlap duration and time of overlapping iterations being above certain threshold --- minimum overlap rate.
+It turned out that SPEC CPU benchmarks overlapped almost all the time as if the iterations were synchronized.
+Java based suites with shorter and more variable benchmarks had similar overlap proportion to minimum overlap rate curve.
+
+\Cref{sec:rq3} looked at iteration variability of different methods and A/A run detection capabilities.
+The overall variability of the benchmark scores across different environments was captured by coefficient of variability and relative width of confidence intervals from the confidence intervals test.
+Coefficient of variability turned out to be below $0.2$ for almost all tested benchmarks in all environments with SPEC CPU being the least variable as expected.
+We did not observe any significant difference between cloud and bare-metal.
+However, the width of confidence intervals clearly differentiates the shared virtual machine environment as the most variable with the sequential method having the biggest variability.
+Again the cloud and \mbox{bare-metal} environments look very similar when compared by confidence interval width.
+
+A/A detection accuracy used adjusted confidence interval test and \mbox{Mann-Whitney} \mbox{u-test}.
+Confidence interval test for asynchronous duet was parametrized by minimum overlap rate pairing of $40\%$ based on empirical observations.
+Confidence interval test was able to successfully detect $90\%$ of all Java benchmarks and $80\%$ of SPEC CPU benchmarks.
+The relatively low success rate of detecting SPEC CPU A/A runs is likely due to its low variability hence relatively low confidence interval width that might not include point $0$.
+To accommodate for this the confidence interval test can be extended to consider the error by which confidence interval missed $0$ and account for some leeway.
+
+\mbox{Mann-Whitney} \mbox{u-test} was much more sensitive to difference hence it has much worse A/A accuracy overall with only $62\%$ correctly detected Java benchmarks.
+However, the sensitivity proved useful for SPEC CPU benchmarks which had $100\%$ A/A detection in the cloud environment and $84\%$ in \mbox{bare-metal}.
+Method comparison with \mbox{u-test} rules asynchronous duet as the best with $74\%$ followed by synchronous duet with $65\%$ and sequential with $60\%$ A/A detection accuracy.
+
+Last, we examined the factor of minimum detectable slowdowns (MDS) using artificially slowed down A/A runs in~\cref{sec:rq4}.
+Duet methods outperformed sequential method with the ability to detect $3-5\%$ slowdown for Java benchmarks and even $1\%$ regression for SPEC CPU benchmarks while the sequential methods had issues detecting even $10\%$ regression in our shared virtual machine environment but was similar in cloud and bare-metal environment.
+
+% Does the result have any practical applications that improve upon something realistic?
+Overall, removing the synchronization requirement does not hurt synchronous duet accuracy improvements.
+With possibilities for significant runtime and cost reduction while keeping high regression detection capabilities we believe that asynchronous duet method is attractive novel benchmarking approach usable even in variable environments.
+Additionally, \lstinline{duet} python package provides a generic way of running and processing benchmarks in containerized environment using sequential and duet methods.
+
+% What is the quality of the result? Is the problem solved for good and the mankind does not need to ever think about it again, or just partially improved upon? (Is the incompleteness caused by overwhelming problem complexity that would be out of thesis scope\todo{This is quite common.}, or any theoretical reasons, such as computational hardness?)
+\section{Future work}
+One thing we did not manage to include into this thesis due to restricted resources is broader coverage of cloud providers and instance types with higher CPU count in particular.
+This could prove that runtime and cost reductions in cloud are similar to what we observed in our shared virtual machine infrastructure.
+More measurements could also examine what is the required amount of runs to achieve some reasonable level of accuracy.
+In our experiments we used 20 runs per benchmark but fewer runs may be sufficient to detect certain level of MDS.
+
+We did not examine synchronized interference of benchmarks in depth.
+This interference can manifest predominantly in asynchronous duet method as shown in~\cref{fig:overlap_interference}.
+One would need to look closer at benchmark workloads and their bottlenecks to see if workloads with different bottlenecks interfere in some synchronous manner while running in duet.
+
+Another thing that needs closer look at individual benchmarks is analysis of benchmarks that duet did not do well on.
+Ideally, there would be some specific common workload traits such as high parallelism that cause issues for duet.
+
+Last thing is statistical methods used to evaluate duet runs.
+Instead of filtering duet overlaps one could use all overlaps and weight them by the quality of an overlap.
+Other possibilities are in the area of hypothesis testing where there might be something better than \mbox{u-test}.
