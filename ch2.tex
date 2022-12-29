@@ -2,7 +2,7 @@
 \label{chap:duet}
 
 Benchmark comparison between two versions of software is referred to as A/B benchmarking, where A and B are some software versions that run the same benchmark code in multiple iterations.
-\Cref{fig:method_timeline} shows a comparison between three benchmarking methods analyzed in this thesis (1) sequential, (2) synchronous duet, and (3) asynchronous duet.
+\Cref{fig:method_timeline} shows a comparison between three benchmarking methods analyzed in this thesis (1) sequential, (2) synchronous duet and (3) asynchronous duet.
 The sequential method is the simplest where each version is run independently of the other.
 Synchronous duet on the other hand runs A and B in parallel and it has to synchronize the starts of individual iterations.
 Asynchronous duet runs in parallel as well but does not require synchronized iterations.
@@ -14,19 +14,19 @@ Asynchronous duet runs in parallel as well but does not require synchronized ite
 	Comparison of different benchmarking methods sequential, synchronous duet, and asynchronous duet when comparing 2 software versions A and B.
 	Benchmark runs 2 iterations with the same durations for all methods and versions.
 	Note that version B introduced a regression where the first iteration takes twice as long.
-	The x axes is an example timeline of measurements.
+	The \mbox{x-axes} is an example timeline of measurements.
 	}
 	\label{fig:method_timeline}
 \end{figure}
 
 % RQ1 Runtime reduction
 The example in \cref{fig:method_timeline} has the durations of iterations equal for all methods, which illustrates one immediate benefit of running duet benchmarks --- overall runtime reduction.
-In an ideal case the duet method could save up to $50\%$ of execution run time and hence halve execution costs.
+In an ideal case, the duet method could save up to $50\%$ of execution run time and hence halve execution costs.
 As this speedup is crucial for time and monetary reasons, we will investigate it thoroughly in this thesis.
-A research question we would like to see answered is therefore:
+A research question we would like to see answered is:
 
 \begin{quote}
-	\textbf{RQ1:} \emph{What are the runtime savings of asynchronous duet method compared to the sequential method?}
+	\textbf{RQ1:} \emph{What are the runtime savings of the asynchronous duet method compared to the sequential method?}
 \end{quote}
 
 % Mutual interference
@@ -36,7 +36,7 @@ Even then, it may be the case that the two virtual cores map to the same hardwar
 Such virtual cores would then compete for the single shared physical core.
 Here~\citet{bulej2019initial} rely on workload symmetry.
 
-Workload symmetry states that if a cloud were to exhibit systematic performance difference between the two virtual cores running duet workloads, it would likely exhibit similar unwarranted performance differences in other common concurrent workloads, such behavior would be likely considered a bug and remedied.
+Workload symmetry states that if a cloud were to exhibit systematic performance differences between the two virtual cores running duet workloads, it would likely exhibit similar unwarranted performance differences in other common concurrent workloads, such behavior would be likely considered a bug and remedied.
 In other words, they rely on fair CPU scheduling~\footnote{Linux kernel uses "Completely Fair Scheduler" \url{https://en.wikipedia.org/wiki/Completely_Fair_Scheduler}} to work out mutual interference.
 \citet{bulej2019initial} also note that this works only for similar workloads, which can be expected of neighboring commits or versions of the same software.
 
@@ -49,11 +49,9 @@ In other words, they rely on fair CPU scheduling~\footnote{Linux kernel uses "Co
 Once an iteration finishes it has to wait for its pair iteration to finish, until then, this pair iteration runs alone.
 It might seem that an asynchronous duet solves this issue because iterations are not blocked on the barrier, so the only iteration running alone will be the last iteration of either A or B, whichever finishes last.
 
-\xxx{Consider including actual example of speedup where workload A is 2x faster than B, but B runs alone at the end so B is actually only 1.5x faster.}
-
-However, asynchronous duet might be worse off in terms of equal impact symmetry on parallel workloads due to the ways benchmark harnesses and benchmarks themselves work.
+However, the asynchronous duet might be worse off in terms of equal impact symmetry on parallel workloads due to the ways benchmark harnesses and benchmarks themselves work.
 \Cref{alg:harness} is a generic example of what an inner loop of a benchmark harness might look like.
-Pre-iteration and post-iteration functions might do some environment checks like running garbage collection, recording or validating results.
+Pre-iteration and post-iteration functions might do some environment checks like running garbage collection and recording or validating results.
 Therefore, it is natural that these additional steps create gaps between measured code and that impacts asynchronous duet symmetry.
 
 \begin{algorithm}
@@ -74,7 +72,7 @@ Therefore, it is natural that these additional steps create gaps between measure
 \caption{
 	Generic workings of the benchmark harness which executes a benchmark.
 	Note that not all harnesses follow this structure --- some functions might be effectively empty.
-	Specifically for synchronous duet~\citet{bulej2020duet} had to modify \emph{PreIteration} to wait on barrier.
+	Specifically for synchronous duet~\citet{bulej2020duet} had to modify \emph{PreIteration} to wait on tabarrier.
 }
 \label{alg:harness}
 \end{algorithm}
@@ -84,16 +82,16 @@ With enough iterations, harness specifics, and potentially different A/B perform
 
 Even if workloads are partially overlapping, the start of a workload might do different things, for example, be CPU bound while the end of the workload might be I/O bound.
 Fair CPU scheduling should, in theory, allocate the same amount of processor time for both workloads essentially synchronizing them.
-However, in practice, due to inherent variability of these systems workloads will diverge.
+However, in practice, due to the inherent variability of these systems workloads will diverge.
 
 For example, \cref{fig:overlap_interference} demonstrates a case when this happens.
 Even workloads with the same performance might get to a state of equilibrium where parts of workloads with different bound nature overlap each other.
 This kind of symmetry can further hinder the impact symmetry argument for the synchronous duet method.
-Therefore, out next research question examines the way duet pairs overlap:
+Therefore, our next research question examines the way duet pairs overlap:
 
 % RQ2 Overlaps
 \begin{quote}
-	\textbf{RQ2:} \emph{How do workloads overlap in asynchronous duet?}
+	\textbf{RQ2:} \emph{How do workloads overlap in the asynchronous duet?}
 \end{quote}
 
 \begin{figure}
@@ -111,15 +109,13 @@ Therefore, out next research question examines the way duet pairs overlap:
 	\centering
 	\includegraphics[width=.9\linewidth]{./figures/overlap_interference.pdf}
 	\caption{
-		Tailored examples of how different nature of a workload might compromise duet's impact symmetry.
-		Initially $A$ and $B$ overlap on both CPU and I/O bound parts which slows down $B$ for first 2 runs.
-		Then however, CPU and I/O bound parts of $A$ and $B$ workloads overlap less end $B$ turns out to be as fast as $A$.
-		Notice that $A$ and $B$ enter a state of equilibrium where each is bound on different parts of underlying hardware.
+		Tailored examples of how different nature of a workload might compromise the duet's impact symmetry.
+		Initially, $A$ and $B$ overlap on both CPU and I/O bound parts which slow down $B$ for the first 2 runs.
+		Then, CPU and I/O bound parts of $A$ and $B$ workloads overlap less end $B$ turns out to be as fast as $A$.
+		Notice that $A$ and $B$ enter a state of equilibrium where each is bound on different parts of the underlying hardware.
 	}
 	\label{fig:overlap_interference}
 \end{figure}
-
-\xxx{Consider nature of long vs. short outside interference and its frequency, very short messes us up while very long is fine for duet and seqn depending on RMIT runtime. There is some sweet spot that duet will perform better with compared to seqn.}
 
 For the asynchronous duet method to be useful runtime reduction and overlapping workloads are not enough.
 The asynchronous duet method has to show accuracy in regression detection on par with the synchronized duet method:
@@ -133,7 +129,7 @@ Additionally, using a similar approach to~\citet{laaber2019software} asynchronou
 
 % RQ4 Minimal detectable slowdown
 \begin{quote}
-	\textbf{RQ4:} \emph{What are the minimal detectable slowdowns with sequential, synchronous duet, and asynchronous duet measurements that we can detect with $95\%$ confidence?}
+	\textbf{RQ4:} \emph{What are the minimal detectable slowdowns with the sequential, synchronous duet, and asynchronous duet measurements that we can detect with $95\%$ confidence?}
 \end{quote}
 
 % Why is it important - runtime reduction, variable environment, no suite modification
@@ -143,11 +139,11 @@ Additionally, using a similar approach to~\citet{laaber2019software} asynchronou
 To summarize, these are the areas of focus for this thesis:
 \begin{description}
 	\item[Accessibility]
-		Asynchronous duet relaxes the synchronized iteration requirement on benchmark harnesses imposed by synchronized duet method.
+		Asynchronous duet relaxes the synchronized iteration requirement on benchmark harnesses imposed by the synchronized duet method.
 		Our goal is to create a generic benchmark super-harness for running benchmarks from various suites using sequential and duet methods and automate the result processing.
 	\item[Runtime and Cost reduction]
 		Duet methods have the potential to drastically reduce, up to $50\%$, the execution time of benchmarks (RQ1).
 	\item[Accuracy]
-		Synchronized duet method can reduce the variance of benchmark results measured in a variable environment, such as a public cloud~\cite{bulej2020duet}.
-		The question is if the asynchronous duet can do the same (RQ2, RQ3, RQ4)?
+		The synchronized duet method can reduce the variance of benchmark results measured in a variable environment, such as a public cloud~\cite{bulej2020duet}.
+		The question is if the asynchronous duet can do the same (RQ2, RQ3, RQ4).
 \end{description}

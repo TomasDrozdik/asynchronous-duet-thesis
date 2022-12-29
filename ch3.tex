@@ -8,17 +8,17 @@ To keep a configuration portable and the dependencies minimal we have decided to
 Tool is named \lstinline{duetbench} and it is part of open sourced~\footnote{Apache Licence 2.0} python package \lstinline{duet}~\footnote{\url{https://github.com/TomasDrozdik/asynchronous-duet}, July 2022} that also implements other complementary tools described in~\cref{sec:result_parsing}.
 Source code is available as an attachment to this thesis~\xxx{ref} and it has documentation in form of GitHub wiki~\cite{wiki}.
 
-We want to compare asynchronous duet with~\citet{bulej2020duet}, hence our super-harness supports synchronized duet and sequential method in containerized environment.
+We want to compare asynchronous duet with~\citet{bulej2020duet}, hence our super-harness supports synchronized duet and sequential method in a containerized environment.
 
 \section{Architecture}
 
 \Cref{fig:duetbench_sequence} depicts architecture of \lstinline{duetbench} script.
 \lstinline{duetbench} is a process on the host machine that spawns subprocesses that run containers --- one for each version A/B.
 Since initialization of a container might take longer \lstinline{duetbench} waits for both containers to start and then uses \lstinline{docker exec}~\footnote{\url{https://docs.docker.com/engine/reference/commandline/exec/}} to run the command that executes the benchmark harness loop from~\cref{alg:harness}.
-Once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them in predefined directory structure that preserves super-harness metadata and raw results~\cite{wiki}.
+Once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them in a predefined directory structure that preserves super-harness metadata and raw results~\cite{wiki}.
 Afterward, stop and clean up both containers.
-We refer to this process is as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting} for sequential runs.
-For duet methods one \emph{run} executes 2 benchmarks in parallel.
+We refer to this process as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting} for sequential runs.
+For duet methods, one \emph{run} executes 2 benchmarks in parallel.
 
 \begin{figure}
     \centering
@@ -31,30 +31,30 @@ For duet methods one \emph{run} executes 2 benchmarks in parallel.
     \label{fig:duetbench_sequence}
 \end{figure}
 
-If there are more benchmarks to execute pick the next one (according a particular scheduling strategy, see~\cref{sec:scheduling}) and do the same process.
+If there are more benchmarks to execute pick the next one (according to a particular scheduling strategy, see~\cref{sec:scheduling}) and do the same process.
 In the case of the sequential method, the process is very much the same just omit the second container entirely and run them separately.
 
 \subsection{Synchronized duet in containerized environment}
 \label{sec:sync_duet_impl}
 
-\citet{bulej2020duet} uses shared-memory barrier to synchronize benchmark iterations.
+\citet{bulej2020duet} uses a \mbox{shared-memory} barrier to synchronize benchmark iterations.
 We ported this solution into the containers to mimic the original behavior.
 
-The barrier uses pthread API that is not available on all systems such as macOS.
-Therefore, \lstinline{duetbench} starts a third container to initialize, and later cleanup, the barrier, hence bypassing the missing functionality on the host system.
+The barrier uses the pthread API that is not available on all systems such as macOS.
+Therefore, \lstinline{duetbench} starts a third container to initialize, and later clean up the barrier, hence bypassing the missing functionality on the host system.
 
 Docker environments are separated by design.
-To facilitate this feature \lstinline{duetbench} mounts host directory \lstinline{-v /dev/shm:/dev/shm} and shares inter process communication namespace \lstinline{--ipc host}~\footnote{\lstinline{docker run} reference \url{https://docs.docker.com/engine/reference/run/}}.
+To facilitate this feature \lstinline{duetbench} mounts host directory \lstinline{-v /dev/shm:/dev/shm} and shares \mbox{inter-process} communication namespace \lstinline{--ipc host}~\footnote{\lstinline{docker run} reference \url{https://docs.docker.com/engine/reference/run/}}.
 
 \subsection{Run Scheduling}
 \label{sec:scheduling}
 
 \lstinline{duetbench} supports two options for \emph{run scheduling}:
 \begin{description}
-    \item[Sequential] where benchmarks are run in order of definition from configuration file.
+    \item[Sequential] where benchmarks are run in order of definition from a configuration file.
     \item[Randomized Interleaving Trials] where it randomly interleaves the runs from a configuration file.
         Hence, it can mix different types of measurement methods and benchmarks.
-        With multiple repetitions of a given measurement method it is essentially RMIT\cite{abedi2017conducting}.
+        With multiple repetitions of a given measurement method, it is essentially RMIT\cite{abedi2017conducting}.
 \end{description}
 
 \section{Configuration}
@@ -62,9 +62,10 @@ To facilitate this feature \lstinline{duetbench} mounts host directory \lstinlin
 
 \Cref{lst:config} shows section of \lstinline{duetbench} YAML configuration file that describes an A/B asynchronous duet and sequential run.
 The goal of the design was to make configuration generic and simple to use so that many harnesses and benchmark suites can be adapted to use with \lstinline{duetbench}.
-Full documentation of the \lstinline{duetbench} configuration including description of how to run synchronized duets not present in the~\cref{lst:config} is on the wiki~\cite{wiki}.
+Full documentation of the \lstinline{duetbench} configuration including a description of how to run synchronized duets (not present in the~\cref{lst:config}) is on the wiki~\cite{wiki}.
 
-Freedom in run command allows for tweaking of the harness to better suite asynchronous duet, for example, some harnesses support skips of validation or various garbage collector options.
+Freedom in run command allows for tweaking of the harness to better suit asynchronous duet.
+For example, some harnesses support skips of validation or various garbage collector options.
 Detailed configuration of experiments is in~\cref{sec:benchmark_configuration}.
 
 \begin{listing}
@@ -97,7 +98,7 @@ avrora:
 
 Once a run finishes, results are copied in their raw format to a dedicated result directory on the host machine.
 Results are then processed using \lstinline{duetprocess} script~\cite{wiki} for further analysis.
-\lstinline{duetprocess} takes an output directory of \lstinline{duetbench} as an input and produces a single CSV result file.
+\lstinline{duetprocess} takes an output directory of \lstinline{duetbench} as input and produces a single CSV result file.
 
 The minimal schema of a result data point looks like this:
 \begin{itemize}
@@ -105,7 +106,7 @@ The minimal schema of a result data point looks like this:
         \begin{itemize}
             \item suite
             \item benchmark
-            \item run: repetetion id, not necessary in  order of execution
+            \item run: repetition id, not necessary in  order of execution
             \item pair
             \item pair order: which pair was started first
             \item iteration
@@ -128,12 +129,12 @@ However, without absolute timestamps, one could not evaluate how iterations over
 \subsection{Notation}
 \label{sec:notation}
 
-To describe parsed results more formally and describe terminology from the \lstinline{duet} package we use following terms:
+To describe parsed results more formally and describe terminology from the \lstinline{duet} package we use the following terms:
 
 \begin{description}
     \item[Environment] $e \in E$ classifies host hardware and software configuration --- where \lstinline{duetbench} runs.
-        Environment is deduced from artifacts in the above schema.
-        Set of environments $E$ used in our experiments is described in~\cref{sec:experiment_setup}.
+        The environment is deduced from artifacts in the above schema.
+        The set of environments $E$ used in our experiments is described in~\cref{sec:experiment_setup}.
     \item[Type] $t \in T$ is the measurement method type where $T = \{seqn, sduet, aduet\}$ for sequential, synchronous duet and asynchronous duet respectively.
     \item[Pair] $p \in P$ is version of tested software in case of A/B runs $P = \{A, B\}$
     \item[Benchmark] $b \in B$ is a benchmark from a benchmark suite, formally $B = \{(suite, benchmark)~|~benchmark \in suite \}$
@@ -168,7 +169,7 @@ $$
 \subsection{Overlaps}
 \label{sec:overlaps}
 
-To address \emph{RQ2} \lstinline{duetprocess} provides a method to compute overlaps of iterations of given asynchronous duet run.
+To address \emph{RQ2} \lstinline{duetprocess} provides a method to compute overlaps of iterations of a given asynchronous duet run.
 Let $(R^A, R^B) \in M^{e, b}_{aduet}$.
 Iterations of respective runs are $R^A = (i^A_1 \dots i^A_{iters})$ and $R^B = (i^B_1 \dots i^B_{iters})$.
 To define iteration overlaps the following notation is used:
@@ -185,8 +186,8 @@ O_{R^A, R^B} =&~\{(i^A_j, i^B_k)~|~overlap\_start(i^A_j, i^B_k) < overlap\_end(i
 \end{align*} 
 
 However, not all overlaps are equally important.
-As shown in~\cref{fig:overlap_timeline} and \emph{RQ2} introduction some overlaps might be tiny and cover start of one iteration with the end of another.
-Following notations are used to express quality of an overlap:
+As shown in~\cref{fig:overlap_timeline} and \emph{RQ2} introduction, some overlaps might be tiny and cover the start of one iteration with the end of another.
+The following notations are used to express the quality of an overlap:
 \begin{align*}
 overlap\_time(i^A, i^B) &= overlap\_end(i^A, i^B) - overlap\_start(i^A, i^B), \\
 overlap\_rate^A(i^A, i^B) &= \frac{overlap\_time(i^A, i^B)}{i^A}, \\

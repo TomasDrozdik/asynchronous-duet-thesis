@@ -2,11 +2,11 @@
 \label{chap:background}
 
 % Introduce benchmarks
-Benchmark harness sets up environment, executes benchmark code in multiple iterations, and then presents some score.
-Score can be iteration time, throughput, number of processed requests etcetera.
+Benchmark harness sets up an environment, executes benchmark code in multiple iterations, and then presents some score.
+The score can be iteration time, throughput, number of processed requests etcetera.
 When a benchmark is a small piece of code, also referred to as performance unit tests by~\citet{horky2015unit}, it is usually written in some microbenchmark framework.
 Microbenchmark execution in a public cloud has been thoroughly examined by~\citet{laaber2019software}.
-If the benchmark code gets bigger it is usually referred to as application benchmarks.
+If the benchmark code gets bigger it is usually referred to as the application benchmark.
 
 % Introduce benchmark suites
 Benchmarks do not have the sole purpose of measuring the performance of an application, inversely they provide a way to measure the capabilities of some hardware.
@@ -46,7 +46,7 @@ Hardware heterogeneity, shared and virtualized infrastructure further amplifies 
 % Introduce statistical methods, later on, mention repeatability, cite do we teach useful statistics?
 With many repetitions and variability across the results, it is necessary to carefully process the results and use statistical methods to find out if a code change introduces a new performance regression.
 The use of statistical methods has been extensively studied in~\citet{bulej2017stat} and further analyzed in~\citet{laaber2019software} specifically in the cloud context.
-To quantify the variability of the distribution of results from a benchmark~\citet{laaber2019software} use coefficient of variance, also called mean standard deviation.
+To quantify the variability of the distribution of results from a benchmark~\citet{laaber2019software} use the coefficient of variance, also called mean standard deviation.
 To compare results of two software versions~\citet{bulej2017stat} use both methods of overlapping confidence intervals computed by bootstrap procedure and hypothesis testing with Wilcoxon rank-sum test and its variation Mann-Whiteney U-test as well as Welch's t-test.
 \citet{bulej2017stat} also raise concerns about the validity of these methods when used for performance measurement data.
 Concerns stem from the fact that performance measurements don't satisfy many common assumptions that statistical methods make such as random independent and identically distributed samples and asymptotic normality of the data.
@@ -61,4 +61,4 @@ To compare performance between multiple versions of some software --- alternativ
 RMIT states that these runs of these alternatives should be run (1) multiple times as discussed above and (2) repetitions of all alternatives should be randomized to minimize both partial and periodic outside interference.
 
 Another method that aims to reduce variance is already mentioned duet benchmarking first introduced in~\citet{bulej2019initial} and further expanded on in~\citet{bulej2020duet}.
-Next chapter examines duet method and its new asynchronous variant in detail and poses research goals for this thesis.
+The next chapter examines the duet method and its new asynchronous variant in detail and poses research goals for this thesis.
