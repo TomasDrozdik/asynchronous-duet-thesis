@@ -18,9 +18,9 @@ ScalaBench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have si
 For DaCapo and ScalaBench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat}, \lstinline{actors}, and \lstinline{jython} (the last two are only in ScalaBench).
 Both suites were run with \lstinline{--novalidation} parameter to tighten the workload loop.
 
-All Java benchmarks were run in OpenJDK 11.0.11 JVM with fixed heap size and disabled garbage collection ergonomics, other virtual machine settings were left at their defaults.
+All \mbox{JVM-based} benchmarks were run in OpenJDK 11.0.11 JVM with fixed heap size and disabled garbage collection ergonomics, other virtual machine settings were left at their defaults.
 
-SPEC CPU 2017 is the sole non-Java benchmark --- representative of natively compiled C, C++, and Fortran benchmarks.
+SPEC CPU 2017 is the sole \mbox{non-JVM benchmark} --- representative of natively compiled C, C++, and Fortran benchmarks.
 We run its rate workloads in peak tuning using the \lstinline{onlyrun} action\footnote{Disclaimer: SPEC CPU prohibits publications of results without verification, but for our use-case verification could affect our results negatively, and we don't report SpecCPU score just use the iteration durations.} that skips additional non-workload steps.
 SPEC CPU was not intended to run in a container and hence we faced multiple issues setting it up.
 From build and training errors in installation step (\lstinline{503.bwaves_r}, \lstinline{510.parest_r}, \lstinline{521.wrf_r}, \lstinline{527.cam4_r}) to runtime memory requirements (\lstinline{502.gcc_r}, \lstinline{523.xalancbmk_r}, \lstinline{526.blender_r}).
@@ -68,7 +68,7 @@ The only exception is the \mbox{shared-VM} environment where we decided not to r
 That sums up to more than 100 days of machine time executing 61 unique benchmarks.
 
 Each benchmark run has been executed for a given amount of iterations or until it reached a timeout.
-Timeout for \mbox{Java-based} benchmarks was 5 minutes and for SPEC CPU it was 30 minutes.
+Timeout for \mbox{JVM-based} benchmarks was 5 minutes and for SPEC CPU it was 30 minutes.
 The iteration limit for Renaissance was set to default which is supposed to be reasonable for that type of benchmark.
 ScalaBench and DaCapo had hard a limit of 50 iterations while SPEC CPU only 10.
 Deep dive into runtime is in the next section.

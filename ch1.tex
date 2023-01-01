@@ -13,7 +13,7 @@ Benchmarks do not have the sole purpose of measuring the performance of an appli
 For this reason, benchmark suites aggregate many application workloads, put them under a single harness, and simplify the performance evaluation process.
 Examples of such suites are from Standard Performance Evaluation Corporation (SPEC) SPEC CPU \footnote{SPEC CPU® 2017 \url{https://www.spec.org/cpu2017/}} and SPECjbb \footnote{SPECjbb® 2015 \url{https://www.spec.org/jbb2015/}}.
 Other standalone suites used in this thesis are Renaissance~\cite{prokopec2019renaissance}, DaCapo \footnote{DaCapo Benchmarks \url{https://dacapo-bench.org/}}, and ScalaBench \footnote{Scala Benchmarking Project \url{https://www.scalabench.org/}} suite.
-All above-mentioned suites are Java-based except for SPEC CPU which has benchmarks written in C, C++, and Fortran and hence is natively compiled.
+All above-mentioned suites are \mbox{JVM-based} except for SPEC CPU which has benchmarks written in C, C++, and Fortran and hence is natively compiled.
 Apart from testing hardware performance, benchmark suites are good candidates for research in performance measurement methods as they strive to provide a wide range of real-world representative workloads.
 
 % Reason about long execution time and attractiveness of the cloud approach
@@ -53,7 +53,7 @@ Concerns stem from the fact that performance measurements don't satisfy many com
 Moreover, performance data also tend to exhibit long-range dependencies between samples, have unknown distributions with long tails, and are not stationary in general which further complicates statistical analysis~\cite{bulej2017stat}.
 So far there does not seem to be any "silver bullet" statistical method that would be a good fit for performance data and thus these techniques need to be used with caution as reasoned in multiple studies~\cite{leitner2016patterns, laaber2019software, bulej2017stat}.
 
-% Measurement methods designed for variable cloud environment
+% Measurement methods designed for volatile cloud environment
 Unfavorable conditions for benchmarking in the cloud spiked interest in research that focuses on performance measurement methods that reduce measurement variability, increase accuracy and reduce false positives of regression detection in a cloud environment.
 One such method and current best practice~\cite{laaber2019software} is called \emph{Randomized Multiple Interleaved Trials} (RMIT) introduced by~\citet{abedi2017conducting}.
 Trial refers to a single run of benchmark, with multiple inside iterations, on a particular version of the software it measures the performance of.

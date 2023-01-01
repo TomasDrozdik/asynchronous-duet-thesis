@@ -28,21 +28,21 @@ It turned out that SPEC CPU benchmarks overlapped almost all the time as if the 
 The overall variability of the benchmark scores across different environments was captured by the coefficient of variability and the relative width of confidence intervals from the confidence intervals test.
 The coefficient of variability turned out to be below $0.2$ for almost all tested benchmarks in all environments with SPEC CPU being the least variable as expected.
 We did not observe any significant difference between cloud and \mbox{bare metal}.
-However, the width of confidence intervals differentiates the shared virtual machine environment as the most variable with the sequential method having the biggest variability.
+However, the width of confidence intervals differentiates the shared virtual machine environment as the most volatile with the sequential method having the biggest variability.
 Again the cloud and \mbox{bare-metal} environments look very similar when compared by confidence interval width.
 
 A/A detection accuracy used an adjusted confidence interval test and \mbox{Mann-Whitney} \mbox{u-test}.
 The confidence interval test for an asynchronous duet was parametrized by the minimum overlap rate pairing of $40\%$ based on empirical observations.
-The confidence interval test was able to successfully detect $90\%$ of all Java benchmarks and $80\%$ of SPEC CPU benchmarks.
+The confidence interval test was able to successfully detect $90\%$ of all \mbox{JVM-based} benchmarks and $80\%$ of SPEC CPU benchmarks.
 The relatively low success rate of detecting SPEC CPU A/A runs is likely due to its low variability hence relatively low confidence interval width that might not include point $0$.
 To accommodate for this the confidence interval test can be extended to consider the error by which the confidence interval missed $0$ and account for some leeway.
 
-\mbox{Mann-Whitney} \mbox{u-test} was much more sensitive to difference hence it has much worse A/A accuracy overall with only $62\%$ correctly detected Java benchmarks.
+\mbox{Mann-Whitney} \mbox{u-test} was much more sensitive to difference hence it has much worse A/A accuracy overall with only $62\%$ correctly detected \mbox{JVM-based} benchmarks.
 However, the sensitivity proved useful for SPEC CPU benchmarks which had $100\%$ A/A detection in the cloud environment and $84\%$ in \mbox{bare-metal}.
 Method comparison with \mbox{u-test} rules asynchronous duet as the best with $74\%$ followed by the synchronous duet with $65\%$ and sequential with $60\%$ A/A detection accuracy.
 
 Last, we examined the factor of minimum detectable slowdowns (MDS) using artificially slowed down A/A runs in~\cref{sec:rq4}.
-Duet methods outperformed sequential method with the ability to detect $3-5\%$ slowdown for Java benchmarks and even $1\%$ regression for SPEC CPU benchmarks while the sequential methods had issues detecting even $10\%$ regression in our shared virtual machine environment but the results were similar in the cloud and bare-metal environments.
+Duet methods outperformed sequential method with the ability to detect $3-5\%$ slowdown for \mbox{JVM-based} benchmarks and even $1\%$ regression for SPEC CPU benchmarks while the sequential methods had issues detecting even $10\%$ regression in our shared virtual machine environment but the results were similar in the cloud and bare-metal environments.
 
 % Does the result have any practical applications that improve upon something realistic?
 Overall, removing the synchronization requirement does not hurt synchronous duet accuracy improvements.

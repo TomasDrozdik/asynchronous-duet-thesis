@@ -1,27 +1,28 @@
 \chapter{Overview of Results Processing}
 \label{chap:results}
 
-With multiple repetitions and substantial variance in measurements, statistical analysis is used to determine performance regression in an A/B run.
-However, finding a software project that exhibits certain slowdowns is difficult.
-More so if it has to apply to particular machine experiments are measured on.
+With multiple repetitions and inherent variance of measurements statistical analysis is used to determine performance regression in an A/B run.
+This chapter describes statistical methods we use to determine and compare measurement variance and regression detection of an A/B run using different benchmarking methods.
 
 \section{A/A runs}
 
-Therefore, research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
-A/A measurements run the same version and later labels runs with A and B labels - as if there were 2 versions.
+Finding a software project that exhibits certain slowdown is difficult since regression is often tied to the hardware running the benchmark.
+Instead, research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
+A/A measurement runs the same version and later labels runs with A and B labels --- as if there were 2 different versions.
 Since the code is the same the performance should be the same as well.
-Different statistical methods such as confidence intervals and hypothesis testing are used to evaluate if the performance of A/B labeled runs is the same.
+Usability of a benchmarking method can thus be a result of its ability to correctly detect A/A measurements correctly.
 In the context of duet runs A/B labeling is performed on concurrently running duet pairs.
 
 \section{Data filtering}
 \label{sec:data_filtering}
 
-In our experiments, we removed the first half of all iterations per run of Java benchmarks to avoid warm-up, same as in~\citet{bulej2020duet}.
+In our experiments, we removed the first half of all iterations per run of \mbox{JVM-based} benchmarks to avoid warm-up, same as in~\citet{bulej2020duet}.
 % TODO: \citet{horky2015java} note that detecting warm-ups is difficult \xxx{read what is says about warm up}.
 \xxx{TODO: describe that we did not remove anything from SpecCPU.}
 
 \section{Accuracy analysis and performance regression tests}
 
+\xxx{TODO: this sentence feels like its repeating what has been said already.}
 The goal of benchmarking is to determine performance speedup or a regression.
 The high variance of iteration times makes this more difficult, but the synchronous duet method has shown \xxx{variance improvements from XYZ to XYZ}~\citet{bulej2020duet}.
 To address the variance of benchmarking methods, using containers, across different environments (\emph{RQ3}), we use various statistical methods.
@@ -51,8 +52,11 @@ Here, we describe the method and extend its use for the asynchronous duet.
 
 First, runs and their iterations need to be paired.
 \begin{description}
-    \item[Sequential] runs don't have any natural pairing, runs are randomly paired by the nature of A/A runs labeling. We decided to pair their iterations sequentially.
-    \item[Synchronous duet] runs are naturally paired - sequentially by iterations.
+    \item[Sequential] runs don't have any natural pairing but are randomly paired by the nature of A/A runs labeling. We decided to pair their iterations sequentially
+        $$
+        is\_pair(i^A_i, i^B_j) = i == j
+        $$
+    \item[Synchronous duet] runs are naturally paired - sequentially by iterations, thus they have the same $is\_pair$ predicate.
     \item[Asynchronous duet] runs can't be paired sequentially.
         Considering A/B measurements, non-synchronized iterations will inevitably diverge, hence sequential iteration pairing wouldn't support impact symmetry.
         Instead, we decided to pair iterations $i^A$ and $i^B$ based on the minimum overlap rate $m \in (0, 1)$ and thus define a set of filtered overlaps as
@@ -60,6 +64,10 @@ First, runs and their iterations need to be paired.
         O^{e,b}_m = \{(i^A, i^B)~|~(i^A, i^B) \in O^{e, b}, overlap\_rate(i^A, i^B) > m\}.
         $$
         The smaller the $m$, the fewer pairs of iterations there will be and vice versa.
+        It follows that this is a predicate for asynchronous duet pairing with minimum overlap rate parameter $m$
+        $$
+        is\_pair(i^A, i^B) = (i^A, i^B) \in O^{e,b}_m.
+        $$
         Analysis of how many overlaps there are for different $m$s is in~\cref{sec:rq2}.
 \end{description}
 Each pairing method returns a set of paired iterations for an experiment $M^{e, b}_t$,
@@ -74,7 +82,7 @@ $$
 
 Furthermore, \citet{bulej2017stat} recommend to use \emph{run means} sampling instead of \emph{runs merged} sampling.
 The runs merged method uses all paired iterations from all runs as a sample.
-Run means, on the other hand, aggregates paired iterations in a paired run using some statistics e.g. arithmetic mean and uses those as samples.
+Run means, on the other hand, aggregates paired iterations in a paired run using statistical methods, for example, arithmetic mean and uses those as samples.
 Given $r$ runs each with $i$ iterations \emph{runs merged} results in $r * i$ observations and \emph{run means} results in $r$ observations.
 
 These observations are used to create $95\%$ confidence interval using non-parametric bootstrap with $9999$ draws with replacement and arithmetic mean as statistics.~\footnote{We used the bootstrap method from python \lstinline{scipy} package \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html} that uses a \mbox{bias-corrected} and accelerated method to compute the CI by default.}
