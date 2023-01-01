@@ -38,7 +38,7 @@
 % (Note: \xxx is a "ToDo label" which makes the unfilled visible. Remove it.)
 \def\ThesisTitle{Asynchronous Duet Benchmarking}
 \def\ThesisAuthor{Tomáš Drozdík}
-\def\YearSubmitted{2022}
+\def\YearSubmitted{2023}
 
 % department assigned to the thesis
 \def\Department{Department of Distributed and Dependable Systems}
@@ -50,18 +50,19 @@
 
 % Study programme and specialization
 \def\StudyProgramme{Software Systems}
-\def\StudyBranch{\xxx{study branch}}
+\def\StudyBranch{System programming}
 
 \def\Dedication{%
-Dedication. \xxx{It is nice to say thanks to supervisors, friends, family, book authors and food providers.}
+I want to thank my supervisor, family and friends for their patience and support.
 }
 
 \def\AbstractEN{%
 % Abstracts are an abstract form of art. Use the most precise, shortest sentences that state what problem the thesis addresses, how it is approached, pinpoint the exact result achieved, and describe the applications and significance of the results. Highlight anything novel that was discovered or improved by the thesis. Maximum length is 200 words, but try to fit into 120. Abstracts are often used for deciding if a reviewer will be suitable for the thesis; a well-written abstract thus increases the probability of getting a reviewer who will like the thesis.
-A/B benchmarking in variable environments such as the public cloud is difficult.
+Accurate regression detection in volatile environments such as the public cloud is difficult.
+Cloud offers accessible and scalable infrastructure to run benchmarks, but the traditional benchmarking methods often fail to predict regressions reliably.
 Duet method acknowledges the variability and runs the workloads in parallel assuming similar outside impact symmetry.
 This thesis examines a duet variant that does not synchronize harness iterations which enables broader use of this method.
-The asynchronous duet method can detect $1-5\%$ slowdowns for most of the tested benchmarks in variable environments while reducing the overall costs by up to $50\%$.
+The asynchronous duet method can detect $1-5\%$ slowdowns for most of the tested benchmarks in volatile environments while reducing the overall costs by up to $50\%$.
 Measurements were obtained by a benchmark automation tool for running and processing benchmarks from multiple suites.
 This tool can run benchmarks with sequential and both duet methods utilizing containers for portability.
 }
@@ -74,7 +75,7 @@ This tool can run benchmarks with sequential and both duet methods utilizing con
 % 3 to 5 keywords (recommended), each enclosed in curly braces.
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\Keywords{%
-\xxx{{key} {words}}
+{benchmarking} {cloud} {duet} {containers}
 }
 
 % If your abstracts are long and do not fit in the infopage, you can make the
