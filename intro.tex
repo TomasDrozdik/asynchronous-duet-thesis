@@ -25,7 +25,7 @@ We refer to this method as \emph{sequential benchmarking} as it runs different v
 The main idea of duet benchmarking is to run both versions in parallel.
 The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
 Afterward, the benchmark scores are statistically evaluated to determine if there is a performance regression between the two versions.
-The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for ScalaBench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2020duet}.
+The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2020duet}.
 However, this method relies on synchronized iterations of a benchmark, which requires benchmark harness modification that synchronizes individual iterations between harnesses.
 
 % How this thesis approaches the problem?
@@ -33,7 +33,7 @@ This thesis explores the relaxation of this synchronization requirement which cr
 To achieve this, we implement a tool for running benchmarks that supports sequential, synchronous, and asynchronous duet methods.
 One novel attribute of this tool is that it runs benchmarks in containers to achieve portability and ease of setup.
 
-Using the tool we run benchmarks from multiple benchmarking suites --- Renaissance, ScalaBench, DaCapo, and SPEC CPU 2017.
+Using the tool we run benchmarks from multiple benchmarking suites --- Renaissance, Scalabench, DaCapo, and SPEC CPU 2017.
 The first three are \mbox{JVM-based} while the last one represents natively compiled benchmarks.
 The goal of this thesis is to assess the viability of the asynchronous duet method for different benchmarks across different environments.
 Our choice of environments included bare-metal measurements on a dedicated server, AWS EC2 \lstinline{t3.medium} instance as cloud representative, and self-hosted shared virtual machine infrastructure.
