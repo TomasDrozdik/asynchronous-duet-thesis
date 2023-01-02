@@ -3,6 +3,7 @@
 
 With multiple repetitions and inherent variance of measurements statistical analysis is used to determine performance regression in an A/B run.
 This chapter describes statistical methods we use to determine and compare measurement variance and regression detection of an A/B run using different benchmarking methods.
+In particular, it adjusts the confidence interval test from \citet{bulej2020duet} to work with asynchronous duet.
 
 \section{A/A runs}
 
@@ -17,8 +18,7 @@ In the context of duet runs A/B labeling is performed on concurrently running du
 \label{sec:data_filtering}
 
 In our experiments, we removed the first half of all iterations per run of \mbox{JVM-based} benchmarks to avoid warm-up, same as in~\citet{bulej2020duet}.
-% TODO: \citet{horky2015java} note that detecting warm-ups is difficult \xxx{read what is says about warm up}.
-\xxx{TODO: describe that we did not remove anything from SpecCPU.}
+We kept all of our SPEC CPU benchmark iterations.
 
 \section{Accuracy analysis and performance regression tests}
 
@@ -85,7 +85,7 @@ The runs merged method uses all paired iterations from all runs as a sample.
 Run means, on the other hand, aggregates paired iterations in a paired run using statistical methods, for example, arithmetic mean and uses those as samples.
 Given $r$ runs each with $i$ iterations \emph{runs merged} results in $r * i$ observations and \emph{run means} results in $r$ observations.
 
-These observations are used to create $95\%$ confidence interval using non-parametric bootstrap with $9999$ draws with replacement and arithmetic mean as statistics.~\footnote{We used the bootstrap method from python \lstinline{scipy} package \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html} that uses a \mbox{bias-corrected} and accelerated method to compute the CI by default.}
+These observations are used to create $95\%$ confidence interval using non-parametric bootstrap with $9999$ draws with replacement and arithmetic mean as statistics.\footnote{We used the bootstrap method from python \lstinline{scipy} package \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html} that uses a \mbox{bias-corrected} and accelerated method to compute the CI by default.}
 For A/A runs we expect distribution $F_X$ to be centered around~$0$.
 Therefore, if the confidence interval encompasses~$0$, we consider the workloads equal, otherwise report a difference.
  

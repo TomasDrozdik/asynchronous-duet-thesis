@@ -40,7 +40,7 @@ Such virtual cores would then compete for the single shared physical core.
 Here~\citet{bulej2019initial} rely on workload symmetry.
 
 Workload symmetry states that if a cloud were to exhibit systematic performance differences between the two virtual cores running duet workloads, it would likely exhibit similar unwarranted performance differences in other common concurrent workloads, such behavior would be likely considered a bug and remedied.
-In other words, they rely on fair CPU scheduling~\footnote{Linux kernel uses "Completely Fair Scheduler" \url{https://en.wikipedia.org/wiki/Completely_Fair_Scheduler}} to work out mutual interference.
+In other words, duet benchmarking relies on fair CPU scheduling such as Completely Fair Scheduler~\cite{pabla2009completely} in Linux to work out mutual interference.
 \citet{bulej2019initial} also note that this works only for similar workloads, which can be expected of neighboring commits or versions of the same software.
 
 % External interference, Synchronized interference, Impact symmetry for seqn syncduet and async duet.

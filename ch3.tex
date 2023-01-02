@@ -4,9 +4,9 @@
 We implemented a super-harness that takes an existing benchmark harness as an input and executes its benchmarks in the asynchronous duet style.
 
 % Running in docker and reasons for it
-To keep a configuration portable and the dependencies minimal we have decided to use the container technology, namely Docker~\cite{merkel2014docker} or Podman~\footnote{\url{https://podman.io/}, July 2022}.
-Tool is named \lstinline{duetbench} and it is part of open sourced~\footnote{Apache Licence 2.0} python package \lstinline{duet}~\footnote{\url{https://github.com/TomasDrozdik/asynchronous-duet}, July 2022} that also implements other complementary tools described in~\cref{sec:result_parsing}.
-Source code is available as an attachment to this thesis~\xxx{ref} and it has documentation in form of GitHub wiki~\cite{wiki}.
+To keep a configuration portable and the dependencies minimal we have decided to use the container technology, namely Docker~\cite{merkel2014docker} or Podman~\cite{podman}.
+Tool is named \lstinline{duetbench}, and it is part of open sourced python package \lstinline{duet}~\cite{duet} that also implements other complementary tools described in~\cref{sec:result_parsing}.
+Documentation is in the form of GitHub wiki~\cite{wiki}.
 
 We want to compare asynchronous duet with~\citet{bulej2020duet}, hence our super-harness supports synchronized duet and sequential method in a containerized environment.
 
@@ -14,7 +14,7 @@ We want to compare asynchronous duet with~\citet{bulej2020duet}, hence our super
 
 \Cref{fig:duetbench_sequence} depicts architecture of \lstinline{duetbench} script.
 \lstinline{duetbench} is a process on the host machine that spawns subprocesses that run containers --- one for each version A/B.
-Since initialization of a container might take longer \lstinline{duetbench} waits for both containers to start and then uses \lstinline{docker exec}~\footnote{\url{https://docs.docker.com/engine/reference/commandline/exec/}} to run the command that executes the benchmark harness loop from~\cref{alg:harness}.
+Since initialization of a container might take longer \lstinline{duetbench} waits for both containers to start and then uses \lstinline{docker exec}\footnote{\url{https://docs.docker.com/engine/reference/commandline/exec/}} to run the command that executes the benchmark harness loop from~\cref{alg:harness}.
 Once both benchmarks finish, copy the raw result of those benchmarks from their respective containers and store them in a predefined directory structure that preserves super-harness metadata and raw results~\cite{wiki}.
 Afterward, stop and clean up both containers.
 We refer to this process as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting} for sequential runs.
@@ -44,7 +44,7 @@ The barrier uses the pthread API that is not available on all systems such as ma
 Therefore, \lstinline{duetbench} starts a third container to initialize, and later clean up the barrier, hence bypassing the missing functionality on the host system.
 
 Docker environments are separated by design.
-To facilitate this feature \lstinline{duetbench} mounts host directory \lstinline{-v /dev/shm:/dev/shm} and shares \mbox{inter-process} communication namespace \lstinline{--ipc host}~\footnote{\lstinline{docker run} reference \url{https://docs.docker.com/engine/reference/run/}}.
+To facilitate this feature \lstinline{duetbench} mounts host directory \lstinline{-v /dev/shm:/dev/shm} and shares \mbox{inter-process} communication namespace \lstinline{--ipc host}\footnote{\url{https://docs.docker.com/engine/reference/run/}}.
 
 \subsection{Run Scheduling}
 \label{sec:scheduling}
@@ -66,7 +66,7 @@ Full documentation of the \lstinline{duetbench} configuration including a descri
 
 Freedom in run command allows for tweaking of the harness to better suit asynchronous duet.
 For example, some harnesses support skips of validation or various garbage collector options.
-Detailed configuration of experiments is in~\cref{sec:benchmark_configuration}.
+Detailed configuration of experiments is in~\cref{sec:experiment_setup}.
 
 \begin{listing}
     \begin{lstlisting}

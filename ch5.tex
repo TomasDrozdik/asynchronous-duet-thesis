@@ -8,27 +8,31 @@ This super harness executes A/A benchmarks from multiple benchmark suites using 
 \section{Experiment setup}
 \label{sec:experiment_setup}
 
-Benchmark suites used in the experiments are Renaissance, ScalaBench, DaCapo, and SPEC CPU 2017.
-Latter three are also part of~\citet{bulej2020duet} and two of those --- ScalaBench and DaCapo are representatives of synchronous duet method as their harnesses were adapted to work with \lstinline{duetbench}.
+Benchmark suites used in the experiments are Renaissance, Scalabench, DaCapo, and SPEC CPU 2017.
+Latter three are also part of~\citet{bulej2020duet} and two of those --- Scalabench and DaCapo are representatives of synchronous duet method as their harnesses were adapted to work with \lstinline{duetbench}.
 
 Renaissance benchmark suite was selected as a modern JVM suite with a focus on parallel workloads among others\cite{prokopec2019renaissance}.
 We used version $0.13$ and had to exclude \lstinline{neo4j-analytics} benchmark as it failed to execute on our configuration.
 
-ScalaBench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have significant overlap in benchmarks but are the only ones that have their runtime altered to run synchronous duet.
-For DaCapo and ScalaBench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat}, \lstinline{actors}, and \lstinline{jython} (the last two are only in ScalaBench).
+Scalabench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have significant overlap in benchmarks but are the only ones that have their runtime altered to run synchronous duet.
+For DaCapo and Scalabench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat}, \lstinline{actors}, and \lstinline{jython} (the last two are only in Scalabench).
 Both suites were run with \lstinline{--novalidation} parameter to tighten the workload loop.
 
 All \mbox{JVM-based} benchmarks were run in OpenJDK 11.0.11 JVM with fixed heap size and disabled garbage collection ergonomics, other virtual machine settings were left at their defaults.
 
 SPEC CPU 2017 is the sole \mbox{non-JVM benchmark} --- representative of natively compiled C, C++, and Fortran benchmarks.
-We run its rate workloads in peak tuning using the \lstinline{onlyrun} action\footnote{Disclaimer: SPEC CPU prohibits publications of results without verification, but for our use-case verification could affect our results negatively, and we don't report SpecCPU score just use the iteration durations.} that skips additional non-workload steps.
+We run its rate workloads in peak tuning using the \lstinline{onlyrun} action\footnote{
+	Disclaimer: SPEC CPU prohibits publications of results without verification, but for our use-case verification could affect our results negatively, and we don't report SPEC CPU score just use the iteration durations.}
+that skips additional non-workload steps.
 SPEC CPU was not intended to run in a container and hence we faced multiple issues setting it up.
 From build and training errors in installation step (\lstinline{503.bwaves_r}, \lstinline{510.parest_r}, \lstinline{521.wrf_r}, \lstinline{527.cam4_r}) to runtime memory requirements (\lstinline{502.gcc_r}, \lstinline{523.xalancbmk_r}, \lstinline{526.blender_r}).
 Overall we run 14 benchmarks from SPEC CPU 2017.
 
+Configuration of \lstinline{duetbench} is to run all benchmarks using Randomized Multiple Interleaving Trials and use Podman containers.
+
 \subsection{Docker setup}
-Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}~\footnote{\url{https://hub.docker.com/r/Renaissancebench/buildenv}}, ScalaBench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}~\footnote{\url{https://hub.docker.com/_/openjdk}} image, but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
-The Docker image for SpecCPU is based on \lstinline{ubuntu} image and the whole suite installation is done in the container build step using a configuration with \lstinline{gcc}, the full configuration is available in the attached source code.
+Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}\footnote{\url{https://hub.docker.com/r/Renaissancebench/buildenv}}, Scalabench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}\footnote{\url{https://hub.docker.com/_/openjdk}} image, but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
+The Docker image for SPEC CPU is based on \lstinline{ubuntu} image and the whole suite installation is done in the container build step using a configuration with \lstinline{gcc}, the full configuration is available in the attached source code.
 
 Docker containers run with no additional options than mentioned in~\cref{chap:impl}.
 In particular, there are no reservations on CPU or memory.
@@ -70,7 +74,7 @@ That sums up to more than 100 days of machine time executing 61 unique benchmark
 Each benchmark run has been executed for a given amount of iterations or until it reached a timeout.
 Timeout for \mbox{JVM-based} benchmarks was 5 minutes and for SPEC CPU it was 30 minutes.
 The iteration limit for Renaissance was set to default which is supposed to be reasonable for that type of benchmark.
-ScalaBench and DaCapo had hard a limit of 50 iterations while SPEC CPU only 10.
+Scalabench and DaCapo had hard a limit of 50 iterations while SPEC CPU only 10.
 Deep dive into runtime is in the next section.
 
 \section{Measurements}
@@ -158,7 +162,7 @@ Therefore, the first method of comparison uses relative standard deviation $CV$ 
 \Cref{fig:cv} shows $CV$ of different benchmarking methods across different environments for all benchmarks.
 It shows that duet methods have comparable variance and even though the sequential method has usually smaller $CV$ in all environments there is no significant difference between methods nor environments.
 SPEC CPU has the smallest $CV$ which is expected since it is the only natively compiled suite with longer runtime.
-A closer look shows common benchmark outliers, namely \lstinline{luindex} in the \mbox{shared-VM} environment in both ScalaBench and DaCapo suites, \lstinline{fop} from DaCapo in \mbox{shared-VM} and cloud environments, and the \lstinline{dotty} from Renaissance suite in the cloud environment which has maximum $CV$ of $0.8$.
+A closer look shows common benchmark outliers, namely \lstinline{luindex} in the \mbox{shared-VM} environment in both Scalabench and DaCapo suites, \lstinline{fop} from DaCapo in \mbox{shared-VM} and cloud environments, and the \lstinline{dotty} from Renaissance suite in the cloud environment which has maximum $CV$ of $0.8$.
 
 \begin{figure}
 	\centering
@@ -175,7 +179,7 @@ As shown in~\cref{sec:rq2} the value of the minimum overlap ratio can significan
 The first important takeaway is that the CI test has reasonably good A/A detection capabilities across all environments.
 However, steep rises or declines imply that multiple benchmarks in the given suite were on the edge of CI straddling $0$ which is expected as higher values of minimum overlap ratio decrease the overlap runtime significantly~\ref{fig:relative_overlap_time}.
 
-ScalaBench in the \mbox{shared-VM} environment comes the off worst with only $70\%$ A/A detection rate closely followed by SPEC CPU with only $81\%$.
+Scalabench in the \mbox{shared-VM} environment comes the off worst with only $70\%$ A/A detection rate closely followed by SPEC CPU with only $81\%$.
 The low correctness of the CI test for the SPEC CPU suite is likely a result of its low variance and small relative CI width as shown in~\cref{fig:ci_width}.
 Based on these findings we set the minimum overlap ratio to $40\%$ in the following CI computations.
 
