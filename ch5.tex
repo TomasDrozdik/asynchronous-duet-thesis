@@ -13,9 +13,11 @@ Latter three are also part of~\citet{bulej2020duet} and two of those --- Scalabe
 
 Renaissance benchmark suite was selected as a modern JVM suite with a focus on parallel workloads among others\cite{prokopec2019renaissance}.
 We used version $0.13$ and had to exclude \lstinline{neo4j-analytics} benchmark as it failed to execute on our configuration.
+That leaves 24 benchmarks in total from Renaissance suite.
 
 Scalabench~($v.9.12$) and DaCapo~($v.9.12$) are both JVM benchmarks that have significant overlap in benchmarks but are the only ones that have their runtime altered to run synchronous duet.
 For DaCapo and Scalabench we excluded \lstinline{batik}, \lstinline{eclipse}, \lstinline{tomcat}, \lstinline{actors}, and \lstinline{jython} (the last two are only in Scalabench).
+That account to 10 and 21 benchmarks in total for DaCapo and Scalabench suites respectively.
 Both suites were run with \lstinline{--novalidation} parameter to tighten the workload loop.
 
 All \mbox{JVM-based} benchmarks were run in OpenJDK 11.0.11 JVM with fixed heap size and disabled garbage collection ergonomics, other virtual machine settings were left at their defaults.
@@ -26,9 +28,7 @@ We run its rate workloads in peak tuning using the \lstinline{onlyrun} action\fo
 that skips additional non-workload steps.
 SPEC CPU was not intended to run in a container and hence we faced multiple issues setting it up.
 From build and training errors in installation step (\lstinline{503.bwaves_r}, \lstinline{510.parest_r}, \lstinline{521.wrf_r}, \lstinline{527.cam4_r}) to runtime memory requirements (\lstinline{502.gcc_r}, \lstinline{523.xalancbmk_r}, \lstinline{526.blender_r}).
-Overall we run 14 benchmarks from SPEC CPU 2017.
-
-Configuration of \lstinline{duetbench} is to run all benchmarks using Randomized Multiple Interleaving Trials and use Podman containers.
+Overall we run 16 benchmarks from SPEC CPU 2017.
 
 \subsection{Docker setup}
 Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}\footnote{\url{https://hub.docker.com/r/Renaissancebench/buildenv}}, Scalabench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}\footnote{\url{https://hub.docker.com/_/openjdk}} image, but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
@@ -37,6 +37,8 @@ The Docker image for SPEC CPU is based on \lstinline{ubuntu} image and the whole
 Docker containers run with no additional options than mentioned in~\cref{chap:impl}.
 In particular, there are no reservations on CPU or memory.
 There are multiple reasons for this (1) benchmarks themselves check the number of available CPUs and set their parallelism accordingly, but that information is returned by the OS and thus would same for both duet pairs regardless of docker allocations, (2) the CPU reservations would rule out use of smaller cloud instances, (3) impact symmetry with completely fair scheduler should allocate equal resources to both benchmarks, hence simplifying setup.
+
+All the measurement actually used Podman containers.
 
 \subsection{Run summary}
 
@@ -67,7 +69,7 @@ The measurements were parallelized across multiple instances in each environment
   \label{table:envs}
 \end{table}
 
-We ran 20 runs of each benchmark in each environment with every available measurement type.
+We ran 20 runs of each benchmark using Randomized Multiple Interleaving Trials method~\cite{abedi2017conducting} in each environment with every available measurement type.
 The only exception is the \mbox{shared-VM} environment where we decided not to run SPEC CPU due to disk and runtime requirements.
 That sums up to more than 100 days of machine time executing 61 unique benchmarks.
 
