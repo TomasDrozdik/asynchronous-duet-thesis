@@ -125,14 +125,14 @@ These results show that using duet methods can significantly reduce the machine 
 
 The second research question aims to understand the nature of asynchronous duet iteration overlaps.
 However, as stated in~\cref{sec:overlaps}, not all overlaps are the same.
-It is especially important for the CI computation from~\ref{sec:ci_test} where the minimum overlap rate is used for pairing asynchronous duet iterations.
+It is especially important for the CI computation from~\ref{sec:ci_test} where the minimum overlap ratio is used for pairing asynchronous duet iterations.
 Formally, for benchmark $b \in B$ in environment $e \in E$ and minimum overlap ratio $m$
 $$
 relative\_overlap\_time^{e, b}_m = \frac{\sum\limits_{(i^A, i^B) \in O^{e,b}_m} 2 * overlap\_time(i^A, i^B)}{\sum\limits_{(R^A, R^B) \in M^{e, b}_{aduet}}(\sum\limits_{i \in R^A} i + \sum\limits_{i \in R^B} i)}.
 $$
 The overlap time in the nominator is doubled because the overlap is symmetric relation and the denominator accounts for the runtime of both pairs, this way the $relative\_overlap\_time^{e, b}_m \in [0, 1]$ and represents a percentage of overlapping workload runtime, not just a harness.
 
-\Cref{fig:relative_overlap_time} shows how much does minimum overlap rate affect the relative overlap time.
+\Cref{fig:relative_overlap_time} shows how much does minimum overlap ratio affect the relative overlap time.
 SPEC CPU has very good overlap coverage which suggests a low variance of iteration durations.
 Other suites show a steady decline as the minimum overlap ratio reaches $90\%$ overlap time is less than $20\%$ of total iteration time hindering the runtime improvements from~\cref{sec:rq1}.
 However, the minimum overlap ratio of $30\%$ or $50\%$ retains above $80\%$ or $60\%$ of iteration runtime respectively, which seems like a good fit for the minimum overlap ratio parameter.
@@ -141,7 +141,7 @@ However, the minimum overlap ratio of $30\%$ or $50\%$ retains above $80\%$ or $
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/relative_overlap_time.pdf}
 	\caption{
-		Box plot of benchmarks in respective suites that describes how big is the relative overlap time of these benchmarks compared to overall iteration time with different minimum overlap rates.
+		Box plot of benchmarks in respective suites that describes how big is the relative overlap time of these benchmarks compared to overall iteration time with different minimum overlap ratio.
 	}
 	\label{fig:relative_overlap_time}
 \end{figure}
@@ -266,5 +266,6 @@ Similar to the CI test, \mbox{u-test} can detect $1\%$ slowdown for the whole SP
 
 \section{Evaluation automation}
 \label{sec:automation}
+
 
 \xxx{Add a section about how the \lstinline{duetprocess} tool automizes above described evaluation.}

@@ -1,7 +1,10 @@
 \chapter{Duet benchmarking}
 \label{chap:duet}
 
-Benchmark comparison between two versions of software is referred to as A/B benchmarking, where A and B are some software versions that run the same benchmark code in multiple iterations.
+Performance comparison of two different software versions is referred to as A/B benchmarking.
+For example, compiler authors want to test if their optimization improved performance of some benchmark, or a web developers want to test if a recent commit caused regression in their internal benchmark.
+In both cases the benchmark code is the same, and it runs with two slightly different workloads, versions A and B, that are similar in nature.
+
 \Cref{fig:method_timeline} shows a comparison between three benchmarking methods analyzed in this thesis (1) sequential, (2) synchronous duet and (3) asynchronous duet.
 The sequential method is the simplest where each version is run independently of the other.
 Synchronous duet on the other hand runs A and B in parallel and it has to synchronize the starts of individual iterations.

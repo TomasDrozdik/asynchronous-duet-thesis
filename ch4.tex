@@ -59,12 +59,12 @@ First, runs and their iterations need to be paired.
     \item[Synchronous duet] runs are naturally paired - sequentially by iterations, thus they have the same $is\_pair$ predicate.
     \item[Asynchronous duet] runs can't be paired sequentially.
         Considering A/B measurements, non-synchronized iterations will inevitably diverge, hence sequential iteration pairing wouldn't support impact symmetry.
-        Instead, we decided to pair iterations $i^A$ and $i^B$ based on the minimum overlap rate $m \in (0, 1)$ and thus define a set of filtered overlaps as
+        Instead, we decided to pair iterations $i^A$ and $i^B$ based on the minimum overlap ratio $m \in (0, 1)$ and thus define a set of filtered overlaps as
         $$
         O^{e,b}_m = \{(i^A, i^B)~|~(i^A, i^B) \in O^{e, b}, overlap\_rate(i^A, i^B) > m\}.
         $$
         The smaller the $m$, the fewer pairs of iterations there will be and vice versa.
-        It follows that this is a predicate for asynchronous duet pairing with minimum overlap rate parameter $m$
+        It follows that this is a predicate for asynchronous duet pairing with minimum overlap ratio parameter $m$
         $$
         is\_pair(i^A, i^B) = (i^A, i^B) \in O^{e,b}_m.
         $$

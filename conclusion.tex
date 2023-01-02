@@ -20,7 +20,7 @@ Overall average speedups were $8\%$, $60\%$ and $54\%$ for cloud, \mbox{bare-met
 % Accuracy
 The third and last goal focused on the accuracy of the asynchronous duet method.
 Initially, we looked at the way asynchronous iterations overlap in~\cref{sec:rq2}.
-Overlap quality was determined by the proportion of overlap duration and time of overlapping iterations being above a certain threshold --- minimum overlap rate.
+Overlap quality was determined by the proportion of overlap duration and time of overlapping iterations being above a certain threshold --- minimum overlap ratio.
 It turned out that SPEC CPU benchmarks overlapped almost all the time as if the iterations were synchronized.
 \mbox{Jave-based} suites with shorter and more variable benchmarks create overlaps of various sizes.
 
@@ -32,7 +32,7 @@ However, the width of confidence intervals differentiates the shared virtual mac
 Again the cloud and \mbox{bare-metal} environments look very similar when compared by confidence interval width.
 
 A/A detection accuracy used an adjusted confidence interval test and \mbox{Mann-Whitney} \mbox{u-test}.
-The confidence interval test for an asynchronous duet was parametrized by the minimum overlap rate pairing of $40\%$ based on empirical observations.
+The confidence interval test for an asynchronous duet was parametrized by the minimum overlap ratio pairing of $40\%$ based on empirical observations.
 The confidence interval test was able to successfully detect $90\%$ of all \mbox{JVM-based} benchmarks and $80\%$ of SPEC CPU benchmarks.
 The relatively low success rate of detecting SPEC CPU A/A runs is likely due to its low variability hence relatively low confidence interval width that might not include point $0$.
 To accommodate for this the confidence interval test can be extended to consider the error by which the confidence interval missed $0$ and account for some leeway.
