@@ -1,7 +1,7 @@
 \chapwithtoc{Conclusion}
 
 Our main goal was to evaluate the behavior of a new duet method variant that does not synchronize iterations.
-Particularly we wanted to answer questions from~\cref{sec:goals}.
+In particular, we wanted to answer questions from~\cref{sec:goals}.
 
 % Was the problem stated in the introduction solved? (Ideally include a list of successfully achieved goals.)
 %% Accessibility
@@ -12,9 +12,9 @@ This tool was used to run measurements in cloud, bare-metal and shared virtual m
 %% Runtime and cost reduction
 The second goal focused on the runtime reduction potential of duet methods.
 \Cref{sec:rq1} shows that most of the natively compiled and longer running benchmarks from SPEC CPU suite ran $80 - 100\%$ faster when using the asynchronous duet method compared to using the sequential method reducing the costs by up to $50\%$.
-But results varied across benchmark suites and environments.
+However, results varied across benchmark suites and environments.
 Cloud environment in particular did not do well in runtime speedups and even manifested a slowdown for some benchmarks.
-Though this was likely caused by cloud instances having 2 vCPUs while other environments had 4.
+Although this was likely caused by cloud instances having 2 vCPUs while other environments had 4.
 Overall average speedups were $8\%$, $60\%$ and $54\%$ for cloud, \mbox{bare-metal} and \mbox{shared-VM} environments respectively.
 
 % Accuracy
@@ -22,7 +22,7 @@ The third and last goal focused on the accuracy of the asynchronous duet method.
 Initially, we looked at the way asynchronous iterations overlap in~\cref{sec:rq2}.
 Overlap quality was determined by the proportion of overlap duration and time of overlapping iterations being above a certain threshold --- minimum overlap ratio.
 It turned out that SPEC CPU benchmarks overlapped almost all the time as if the iterations were synchronized.
-\mbox{Jave-based} suites with shorter and more variable benchmarks create overlaps of various sizes.
+\mbox{JVM-based} suites with shorter and more variable benchmarks create overlaps of various sizes.
 
 \Cref{sec:rq3} looked at iteration variability of different methods and A/A run detection capabilities.
 The overall variability of the benchmark scores across different environments was captured by the coefficient of variability and the relative width of confidence intervals from the confidence intervals test.
@@ -50,7 +50,7 @@ With possibilities for significant runtime and cost reduction while keeping high
 Additionally, the \lstinline{duet} python package provides a generic way of running and processing benchmarks in the containerized environment using sequential and duet methods.
 
 % What is the quality of the result? Is the problem solved for good and the mankind does not need to ever think about it again, or just partially improved upon? (Is the incompleteness caused by overwhelming problem complexity that would be out of thesis scope\todo{This is quite common.}, or any theoretical reasons, such as computational hardness?)
-\section{Future work}
+\section*{Future work}
 One thing we did not manage to include in this thesis due to restricted resources is broader coverage of cloud providers and instance types with higher CPU count in particular.
 This could prove that runtime and cost reductions in the cloud are similar to what we observed in our shared virtual machine infrastructure.
 More measurements could also examine what is the required amount of runs to achieve some reasonable level of accuracy.

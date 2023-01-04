@@ -1,7 +1,7 @@
 \chapwithtoc{Introduction}
 
 % What is the nature of the problem the thesis is addressing?
-Modern software development with rapid development cycles is in dire need of a fast, accessible, scalable, and reliable performance regression detection method.
+Modern software development with rapid development cycles is in dire need of a~fast, accessible, scalable, and reliable performance regression detection method.
 A typical question is if neighboring commits of the same software manifest regression.
 For instance, authors of a compiler might be concerned if a new optimization increased the performance of a particular benchmark.
 
@@ -26,7 +26,7 @@ The main idea of duet benchmarking is to run both versions in parallel.
 The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
 Afterward, the benchmark scores are statistically evaluated to determine if there is a performance regression between the two versions.
 The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2020duet}.
-However, this method relies on synchronized iterations of a benchmark, which requires benchmark harness modification that synchronizes individual iterations between harnesses.
+However, this method relies on synchronized iterations of a~benchmark, which requires benchmark harness modification that synchronizes individual iterations between harnesses.
 
 % How this thesis approaches the problem?
 This thesis explores the relaxation of this synchronization requirement which creates a new variant of the duet method we call \emph{asynchronous duet method}.

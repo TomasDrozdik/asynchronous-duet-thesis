@@ -94,12 +94,12 @@ The first research question is meant to answer whether the duet methods have ove
 The presumption is that since duets run concurrently they can be twice as fast as the sequential method which runs one by one.
 
 Runtime is computed on raw measurements, from the start of the particular run to its end. For the sequential method since pairs don't run in parallel add the duration of pairs A and B.
-For duet, methods take a sooner start and a later end of a run to compute the duration.
+For duet, methods take a sooner start and a later end of a run to compute the duration
 \begin{align*}
 runtime^{e, b}_{seqn}  =&~\{end(R^A) - start(R^A) + end(R^B) - start(R^B)~|\\
-                        &~~(R^A, R^B) \in M^{e, b}_{seqn}\} \\
+                        &~~(R^A, R^B) \in M^{e, b}_{seqn}\}, \\
 runtime^{e, b}_{aduet} =&~\{min(start(R^A), start(R^B)) - max(end(R^A), end(R^B))~|\\
-                        &~~(R^A, R^B) \in M^{e, b}_{aduet}\}
+                        &~~(R^A, R^B) \in M^{e, b}_{aduet}\}.
 \end{align*}
 
 Then runtime speedup for particular benchmark $b \in B$ in an environment $e \in E$:
@@ -132,10 +132,10 @@ These results show that using duet methods can significantly reduce the machine 
 The second research question aims to understand the nature of asynchronous duet iteration overlaps.
 However, as stated in~\cref{sec:overlaps}, not all overlaps are the same.
 It is especially important for the CI computation from~\ref{sec:ci_test} where the minimum overlap ratio is used for pairing asynchronous duet iterations.
-Formally, for benchmark $b \in B$ in environment $e \in E$ and minimum overlap ratio $m$
-$$
-relative\_overlap\_time^{e, b}_m = \frac{\sum\limits_{(i^A, i^B) \in O^{e,b}_m} 2 * overlap\_time(i^A, i^B)}{\sum\limits_{(R^A, R^B) \in M^{e, b}_{aduet}}(\sum\limits_{i \in R^A} i + \sum\limits_{i \in R^B} i)}.
-$$
+Formally, define the relative overlap time for benchmark $b \in B$ in environment $e \in E$ and minimum overlap ratio $m$ as
+\begin{equation}\label{eq:relative_overlap_time}
+relative\_overlap\_time^{e, b}_m = \frac{\sum\limits_{(i^A, i^B) \in O^{e,b}_m} 2 * overlap\_time(i^A, i^B)}{\sum\limits_{(R^A, R^B) \in M^{e, b}_{aduet}}\left(\sum\limits_{i \in R^A} i + \sum\limits_{i \in R^B} i\right)}.
+\end{equation}
 The overlap time in the nominator is doubled because the overlap is symmetric relation and the denominator accounts for the runtime of both pairs, this way the $relative\_overlap\_time^{e, b}_m \in [0, 1]$ and represents a percentage of overlapping workload runtime, not just a harness.
 
 \Cref{fig:relative_overlap_time} shows how much does minimum overlap ratio affect the relative overlap time.
@@ -147,12 +147,10 @@ However, the minimum overlap ratio of $30\%$ or $50\%$ retains above $80\%$ or $
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/relative_overlap_time.pdf}
 	\caption{
-		Box plot of benchmarks in respective suites that describes how big is the relative overlap time of these benchmarks compared to overall iteration time with different minimum overlap ratio.
+		Box plot of benchmark relative overlap time from~\cref{eq:relative_overlap_time} based on minimum overlap ratio.
 	}
 	\label{fig:relative_overlap_time}
 \end{figure}
-
-\xxx{TODO: Include examples of some overlap length distributions. Consider including lag some lag plots that would show synchronized nature of overlaps.}
 
 \subsection{RQ3: Accuracy improvements}
 \label{sec:rq3}
@@ -170,7 +168,7 @@ A closer look shows common benchmark outliers, namely \lstinline{luindex} in the
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/cv.pdf}
 	\caption{
-		Box plot of benchmarks from respective suites and their $CV$ for different benchmarking methods and environments.
+		Box plot of $CV$s of benchmarks from respective suites.
 	}
 	\label{fig:cv}
 \end{figure}
@@ -189,8 +187,11 @@ Based on these findings we set the minimum overlap ratio to $40\%$ in the follow
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/citest_aa_match_by_overlap.pdf}
 	\caption{
-		The effect of asynchronous duet overlap ratio on correct A/A run detection using the CI test.
+		The effect of the CI test parameter minimum overlap ratio, on correct A/A run detection for the asynchronous duet.
+		The \mbox{y-axis} shows the proportion of benchmarks that the CI test considers equal in performance --- does not report a regression.
 		Note that each suite has a different amount of benchmarks.
+		For example a $20\%$ change in DaCapo A/A detection rate means that CI test changed its verdict for 2 benchmarks in total.
+		Number of benchmarks in each suite is in~\cref{sec:experiment_setup}.
 	}
 	\label{fig:citest_overlap_aa}
 \end{figure}
@@ -204,7 +205,7 @@ Surprisingly, the CI width for the cloud environment looks very similar to bare 
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/ci_width.pdf}
 	\caption{
-		Box plot of benchmarks from respective suites and their relative CI width. 
+		Box plot of benchmark relative CI width from~\cref{eq:relative_ci_width}.
 		CI for asynchronous duet uses the minimum overlap ratio of $40\%$.
 	}
 	\label{fig:ci_width}
@@ -219,6 +220,7 @@ One particular thing to point out is that the sequential method is not worse tha
 	\includegraphics[width=1\linewidth]{./figures/citest_aa_match.pdf}
 	\caption{
 		The success of the CI test in determining A/A run.
+		The \mbox{y-axis} shows the proportion of benchmarks that the CI test considers equal in performance --- does not report a regression.
 	}
 	\label{fig:citest_aa}
 \end{figure}
@@ -232,6 +234,7 @@ However, it has a $100\%$ success rate on the SPEC CPU suite in the cloud enviro
 	\includegraphics[width=1\linewidth]{./figures/utest_aa_match.pdf}
 	\caption{
 		The success of \mbox{u-test} in determining A/A run.
+		The \mbox{y-axis} shows the proportion of benchmarks that the \mbox{u-test} considers equal in performance --- does not report a regression.
 	}
 	\label{fig:utest_aa}
 \end{figure}
@@ -253,7 +256,9 @@ Overall almost all benchmarks have MDS of $5\%$.
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/mds_citest.pdf}
 	\caption{
-    MDS using CI-test.
+		Facet plot of minimal detectable slowdowns using the CI test.
+		The \mbox{x-axis} has the artificially applied slowdown on one pair, starting from no slowdown (A/A run) to $15\%$ slowdown.
+		The \mbox{y-axis} shows the proportion of benchmarks from given suite that CI test considers equal in performance despite the applied slowdown.
 	}
 	\label{fig:mds_citest}
 \end{figure}
@@ -265,7 +270,8 @@ Similar to the CI test, \mbox{u-test} can detect $1\%$ slowdown for the whole SP
 	\centering
 	\includegraphics[width=1\linewidth]{./figures/mds_utest.pdf}
 	\caption{
-    MDS using \mbox{u-test}.
+		Minimal detectable slowdown of SPEC CPU suite using \mbox{u-test}.
+		Note that \mbox{u-test} has $100\%$ accuracy in the cloud environment, and it is able to detect a $2\%$ slowdown for all SPEC CPU benchmarks using asynchronous duet.
 	}
 	\label{fig:mds_utest}
 \end{figure}
@@ -273,5 +279,19 @@ Similar to the CI test, \mbox{u-test} can detect $1\%$ slowdown for the whole SP
 \section{Evaluation automation}
 \label{sec:automation}
 
+To streamline the duet evaluation process \lstinline{duet} package provides a set of interactive Jupyter notebooks that give a more detailed view into the results.
+Specifically, they visualize data behind each research question separately per benchmark.
 
-\xxx{Add a section about how the \lstinline{duetprocess} tool automizes above described evaluation.}
+One example from these notebooks is the~\cref{fig:ci_example} that show the confidence intervals from CI test~\cref{sec:ci_test} for SPEC CPU benchmarks.
+It clearly shows that some benchmarks are much more variable than others particularly in the cloud environment.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{./figures/ci_example_benchmark.pdf}
+	\caption{
+		Confidence intervals used in the CI test for the SPEC CPU suite.
+		Benchmarks are considered equal in performance if the CI contains point $0$, otherwise the test reports a regression.
+		The \mbox{y-axis} shows the bootstrapped $95\%$ confidence interval of the differences between paired A/B iteration times in seconds as described in~\cref{sec:ci_test}.
+	}
+	\label{fig:ci_example}
+\end{figure}

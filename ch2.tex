@@ -7,10 +7,10 @@ In both cases the benchmark code is the same, and it runs with two slightly diff
 
 \Cref{fig:method_timeline} shows a comparison between three benchmarking methods analyzed in this thesis (1) sequential, (2) synchronous duet and (3) asynchronous duet.
 The sequential method is the simplest where each version is run independently of the other.
-Synchronous duet on the other hand runs A and B in parallel and it has to synchronize the starts of individual iterations.
+Synchronous duet on the other hand runs A and B in parallel, and it has to synchronize the starts of individual iterations.
 Asynchronous duet runs in parallel as well but does not require synchronized iterations.
 
-\begin{figure}
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=.9\linewidth]{./figures/method_timeline.pdf}
 	\caption{
@@ -26,7 +26,7 @@ Asynchronous duet runs in parallel as well but does not require synchronized ite
 The example in \cref{fig:method_timeline} has the durations of iterations equal for all methods, which illustrates one immediate benefit of running duet benchmarks --- overall runtime reduction.
 In an ideal case, the duet method could save up to $50\%$ of execution run time and hence halve execution costs.
 As this speedup is crucial for time and monetary reasons, we will investigate it thoroughly in this thesis.
-A research question we would like to see answered is:
+Therefore, we would like to answer the following research question.
 
 \begin{quote}
 	\textbf{RQ1:} \emph{What are the runtime savings of the asynchronous duet method compared to the sequential method?}
@@ -90,14 +90,14 @@ However, in practice, due to the inherent variability of these systems workloads
 For example, \cref{fig:overlap_interference} demonstrates a case when this happens.
 Even workloads with the same performance might get to a state of equilibrium where parts of workloads with different bound nature overlap each other.
 This kind of symmetry can further hinder the impact symmetry argument for the synchronous duet method.
-Therefore, our next research question examines the way duet pairs overlap:
+Therefore, our next research question examines the way duet pairs overlap.
 
 % RQ2 Overlaps
 \begin{quote}
-	\textbf{RQ2:} \emph{How do workloads overlap in the asynchronous duet?}
+	\textbf{RQ2} \emph{How do workloads overlap in the asynchronous duet?}
 \end{quote}
 
-\begin{figure}
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=.9\linewidth]{./figures/overlap_timeline.pdf}
 	\caption{
@@ -108,7 +108,7 @@ Therefore, our next research question examines the way duet pairs overlap:
 	\label{fig:overlap_timeline}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=.9\linewidth]{./figures/overlap_interference.pdf}
 	\caption{
@@ -144,7 +144,7 @@ To summarize, these are the areas of focus for this thesis:
 	\item[Accessibility]
 		Asynchronous duet relaxes the synchronized iteration requirement on benchmark harnesses imposed by the synchronized duet method.
 		Our goal is to create a generic benchmark super-harness for running benchmarks from various suites using sequential and duet methods and automate the result processing.
-	\item[Runtime and Cost reduction]
+	\item[Runtime and cost reduction]
 		Duet methods have the potential to drastically reduce, up to $50\%$, the execution time of benchmarks (RQ1).
 	\item[Accuracy]
 		The synchronized duet method can reduce the variance of benchmark results measured in a volatile environment, such as a public cloud~\cite{bulej2020duet}.

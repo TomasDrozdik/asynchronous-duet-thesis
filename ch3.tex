@@ -20,7 +20,7 @@ Afterward, stop and clean up both containers.
 We refer to this process as a \emph{run} and it is analogous to a \emph{trial} from~\citet{laaber2019software} and~\citet{abedi2017conducting} for sequential runs.
 For duet methods, one \emph{run} executes 2 benchmarks in parallel.
 
-\begin{figure}
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{./figures/duetbench-sequence.drawio.pdf}
     \caption{
@@ -54,7 +54,7 @@ To facilitate this feature \lstinline{duetbench} mounts host directory \lstinlin
     \item[Sequential] where benchmarks are run in order of definition from a configuration file.
     \item[Randomized Interleaving Trials] where it randomly interleaves the runs from a configuration file.
         Hence, it can mix different types of measurement methods and benchmarks.
-        With multiple repetitions of a given measurement method, it is essentially RMIT\cite{abedi2017conducting}.
+        With multiple repetitions of a given measurement method, it is essentially RMIT~\cite{abedi2017conducting}.
 \end{description}
 
 \section{Configuration}
@@ -68,7 +68,7 @@ Freedom in run command allows for tweaking of the harness to better suit asynchr
 For example, some harnesses support skips of validation or various garbage collector options.
 Detailed configuration of experiments is in~\cref{sec:experiment_setup}.
 
-\begin{listing}
+\begin{listing}[!ht]
     \begin{lstlisting}
 avrora:
   image: dacapo
@@ -104,18 +104,18 @@ The minimal schema of a result data point looks like this:
 \begin{itemize}
     \item Directly parsed by \lstinline{duetprocess}:
         \begin{itemize}
-            \item suite
-            \item benchmark
-            \item run: repetition id, not necessary in  order of execution
-            \item pair
-            \item pair order: which pair was started first
-            \item iteration
-            \item \emph{artifacts}: \lstinline{duetbench} provides an option to run some additional commands such as \lstinline{lscpu} or \lstinline{cat /proc/meminfo} to obtain information about host environment
+            \item suite,
+            \item benchmark,
+            \item run --- repetition id, not necessary in  order of execution,
+            \item pair,
+            \item pair order --- which pair was started first,
+            \item iteration,
+            \item \emph{artifacts} --- \lstinline{duetbench} provides an option to run some additional commands such as \lstinline{lscpu} or \lstinline{cat /proc/meminfo} to obtain information about host environment.
         \end{itemize}
     \item Specific per benchmark suite parsers:
         \begin{itemize}
-            \item iteration start absolute timestamp (ns)
-            \item iteration end absolute timestamp (ns)
+            \item iteration start absolute timestamp,
+            \item iteration end absolute timestamp.
         \end{itemize}
 \end{itemize}
 

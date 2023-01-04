@@ -54,7 +54,7 @@ First, runs and their iterations need to be paired.
 \begin{description}
     \item[Sequential] runs don't have any natural pairing but are randomly paired by the nature of A/A runs labeling. We decided to pair their iterations sequentially
         $$
-        is\_pair(i^A_i, i^B_j) = i == j
+        is\_pair(i^A_i, i^B_j) = True \Longleftrightarrow i = j.
         $$
     \item[Synchronous duet] runs are naturally paired - sequentially by iterations, thus they have the same $is\_pair$ predicate.
     \item[Asynchronous duet] runs can't be paired sequentially.
@@ -66,7 +66,7 @@ First, runs and their iterations need to be paired.
         The smaller the $m$, the fewer pairs of iterations there will be and vice versa.
         It follows that this is a predicate for asynchronous duet pairing with minimum overlap ratio parameter $m$
         $$
-        is\_pair(i^A, i^B) = (i^A, i^B) \in O^{e,b}_m.
+        is\_pair(i^A, i^B) = True \Longleftrightarrow (i^A, i^B) \in O^{e,b}_m.
         $$
         Analysis of how many overlaps there are for different $m$s is in~\cref{sec:rq2}.
 \end{description}
@@ -92,10 +92,10 @@ Therefore, if the confidence interval encompasses~$0$, we consider the workloads
 \subsubsection{Variability comparison using CI}
 \label{sec:ci_width}
 
-Another use of these confidence intervals is to compute their relative width and compare the variance of different measurement methods~\cite{bulej2019initial}.
-$$
+Another use of these confidence intervals is to compute their relative width and compare the variance of different measurement methods~\cite{bulej2019initial} as
+\begin{equation}\label{eq:relative_ci_width} 
 CI_{relative\_width}(X) = \frac{CI_{width}(X)}{mean(X)}.
-$$
+\end{equation}
 
 \subsection{Mann-Whitney u-test}
 \label{sec:utest}
@@ -115,12 +115,13 @@ Hence, if \mbox{p-value} is below $5\%$ for a given benchmark, test method, and 
 \Citet{laaber2019software} explore the minimal detectable slowdowns (MDS) for a sequential micro-benchmarking method to determine which micro-benchmarks are viable for cloud benchmarking.
 We use this method to determine the viability of duet methods compared to sequential methods in the cloud environment.
 
-First, A/A test results need to be adjusted --- emulate a scenario where pair B is $s$ times wlog slower --- emulating A/B test results where version B has a performance regression.
-For all iterations running version B, multiply its runtime by $s$.
+First, A/A test results are adjusted to emulate a scenario where pair B is $s$ times wlog slower --- emulating A/B test results where version B has a performance regression.
+For all iterations running version B, iteration runtime is multiplied by $s$.
+Formally
 $$
 \forall (R^A, R^B) \in M^{e} ~:~ R^B_{slowed} = \{i * s~|~\forall i \in R^B \}.
-$$\
-For asynchronous duet increased iteration times of B affect the overlap of A and B.
-Thus we need to recompute the start and end timestamps of each B's iteration, assuming the gaps in between workload runs remain unchanged.
+$$
+Increased iteration times of pair B affect the overlap of A and B during asynchronous duet.
+Therefore, recompute the start and end timestamps of each B's iteration, assuming the gaps between iterations remain unchanged.
 
-Second, use either the confidence interval test or \mbox{Mann-Whitney} \mbox{u-test} to determine if adjusted A/B measurements show performance regression on different known slowdowns.
+Then the altered results can be compared as if they were A/B runs using the confidence interval test or \mbox{Mann-Whitney} \mbox{u-test} while the slowdown is known.
