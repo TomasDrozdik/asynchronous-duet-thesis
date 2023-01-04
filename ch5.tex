@@ -31,7 +31,7 @@ From build and training errors in installation step (\lstinline{503.bwaves_r}, \
 Overall we run 16 benchmarks from SPEC CPU 2017.
 
 \subsection{Docker setup}
-Docker image for Renaissance suite is based on \lstinline{renaissancebench/buildenv:openj9-openjdk11}\footnote{\url{https://hub.docker.com/r/Renaissancebench/buildenv}}, Scalabench and DaCapo images are based on \lstinline{openjdk:11.0.8-jdk}\footnote{\url{https://hub.docker.com/_/openjdk}} image, but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
+Docker image for Renaissance suite is based on official Renaissance docker image \footnote{\url{https://hub.docker.com/r/renaissancebench/buildenv}} based on OpenJDK~11, Scalabench and DaCapo images are built from \lstinline{openjdk:11.0.8-jdk}\footnote{\url{https://hub.docker.com/_/openjdk}} image, but it is adjusted to run synchronization agent described in~\cref{sec:sync_duet_impl}.
 The Docker image for SPEC CPU is based on \lstinline{ubuntu} image and the whole suite installation is done in the container build step using a configuration with \lstinline{gcc}, the full configuration is available in the attached source code.
 
 Docker containers run with no additional options than mentioned in~\cref{chap:impl}.
@@ -84,17 +84,17 @@ Deep dive into runtime is in the next section.
 
 The following sections provide answers to research questions proposed in~\cref{chap:duet}.
 Often, due to a big number of benchmarks, we aggregate the results by suites or measurement methods.
-For detailed --- per benchmark results look into the attached python notebooks described in~\cref{sec:automation}.
+For detailed --- per benchmark results see~\cref{sec:automation}.
 All data in the following figures are subject to data preprocessing described in~\cref{sec:data_filtering} unless stated otherwise.
 
 \subsection{RQ1: Runtime savings}
 \label{sec:rq1}
 
-The first research question is meant to answer whether the duet methods have overall runtime savings compared to the sequential method.
-The presumption is that since duets run concurrently they can be twice as fast as the sequential method which runs one by one.
+The first research question regards the duet methods overall runtime reduction compared to the sequential method.
+The presumption is that since duets run concurrently they can be up to twice as fast as the sequential method.
 
-Runtime is computed on raw measurements, from the start of the particular run to its end. For the sequential method since pairs don't run in parallel add the duration of pairs A and B.
-For duet, methods take a sooner start and a later end of a run to compute the duration
+Runtime is computed on raw measurements, from the start of the particular run to its end.
+For the sequential method add the duration of pairs A and B since pairs don't run in parallel, for duet methods, take a sooner start and a later end of a run to compute the duration
 \begin{align*}
 runtime^{e, b}_{seqn}  =&~\{end(R^A) - start(R^A) + end(R^B) - start(R^B)~|\\
                         &~~(R^A, R^B) \in M^{e, b}_{seqn}\}, \\
@@ -110,7 +110,8 @@ runtime\_speedup^{e, b} = \frac{mean(runtime^{e, b}_{seqn})}{mean(runtime^{e, b}
 \Cref{fig:runtime_speedup} shows what was the runtime speedup of asynchronous duet run.
 As it turns out this is heavily dependent on the environment and on the type of benchmark.
 Some benchmarks are indeed almost twice as fast, especially from the SPEC CPU suite in stable environments.
-However, there is significant variability and even in the \mbox{bare-metal} environment some benchmarks show no speedup at all, in cloud duet is even slower for some benchmarks.
+However, there is significant variability and even in the \mbox{bare-metal} environment some benchmarks show no speedup at all.
+Duet in the cloud environment is even slower for some benchmarks.
 This is likely the cause of vCPU discrepancy as \lstinline{t3.medium} has only $2$ vCPUs while other environments have $4$.
 
 Overall, the median speedup is $5\%$, $73\%$, and $53\%$ for cloud, bare-metal, and shared-VM environments respectively.
@@ -136,7 +137,8 @@ Formally, define the relative overlap time for benchmark $b \in B$ in environmen
 \begin{equation}\label{eq:relative_overlap_time}
 relative\_overlap\_time^{e, b}_m = \frac{\sum\limits_{(i^A, i^B) \in O^{e,b}_m} 2 * overlap\_time(i^A, i^B)}{\sum\limits_{(R^A, R^B) \in M^{e, b}_{aduet}}\left(\sum\limits_{i \in R^A} i + \sum\limits_{i \in R^B} i\right)}.
 \end{equation}
-The overlap time in the nominator is doubled because the overlap is symmetric relation and the denominator accounts for the runtime of both pairs, this way the $relative\_overlap\_time^{e, b}_m \in [0, 1]$ and represents a percentage of overlapping workload runtime, not just a harness.
+The overlap time in the nominator computes the sum of filtered overlaps from~\cref{eq:overlap_set_filtered}.
+This sum is doubled because the overlap is symmetric relation and the denominator accounts for the runtime of both pairs, this way the $relative\_overlap\_time^{e, b}_m \in [0, 1]$ and represents a percentage of overlapping workload runtime, not just overlapping harness.
 
 \Cref{fig:relative_overlap_time} shows how much does minimum overlap ratio affect the relative overlap time.
 SPEC CPU has very good overlap coverage which suggests a low variance of iteration durations.
@@ -250,7 +252,8 @@ The bigger the slowdown the sooner the A/A match should drop to $0\%$ --- no ben
 \Cref{fig:mds_citest} shows MDS using the CI-test.
 The SPEC CPU has MDS of $1\%$ slowdown for both benchmarking methods and in both environments but its initial A/A detection is only at approximately $80\%$.
 The rest of the benchmarks have fairly similar trends of MDS with the sequential method sometimes lacking slightly behind duet methods.
-Overall almost all benchmarks have MDS of $5\%$.
+Overall almost all benchmarks using duet methods have MDS of $5\%$ in bare-metal and cloud environments.
+However, the sequential method in the \mbox{shared-VM} environment performs significantly worse than duet methods as it fails to detect even some $15\%$ regressions likely because of the biggest relative CI width in this environment as shown by~\cref{fig:ci_width}.
 
 \begin{figure}
 	\centering
@@ -264,7 +267,7 @@ Overall almost all benchmarks have MDS of $5\%$.
 \end{figure}
 
 Since \mbox{u-test} showed a reasonable A/A detection rate only for the SPEC CPU benchmark we showcase MDS for this suite only in~\cref{fig:mds_utest}.
-Similar to the CI test, \mbox{u-test} can detect $1\%$ slowdown for the whole SPEC CPU suite.
+Similar to the CI test, \mbox{u-test} can detect $1-2\%$ slowdown for the whole SPEC CPU suite both in cloud and \mbox{bare-metal} environment.
 
 \begin{figure}
 	\centering

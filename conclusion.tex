@@ -31,7 +31,7 @@ We did not observe any significant difference between cloud and \mbox{bare metal
 However, the width of confidence intervals differentiates the shared virtual machine environment as the most volatile with the sequential method having the biggest variability.
 Again the cloud and \mbox{bare-metal} environments look very similar when compared by confidence interval width.
 
-A/A detection accuracy used an adjusted confidence interval test and \mbox{Mann-Whitney} \mbox{u-test}.
+A/A detection accuracy used an adjusted confidence interval test and \mbox{u-test}.
 The confidence interval test for an asynchronous duet was parametrized by the minimum overlap ratio pairing of $40\%$ based on empirical observations.
 The confidence interval test was able to successfully detect $90\%$ of all \mbox{JVM-based} benchmarks and $80\%$ of SPEC CPU benchmarks.
 The relatively low success rate of detecting SPEC CPU A/A runs is likely due to its low variability hence relatively low confidence interval width that might not include point $0$.
@@ -63,6 +63,6 @@ One would need to look closer at benchmark workloads and their bottlenecks to se
 Another thing that needs a closer look at individual benchmarks is an analysis of benchmarks that the duet did not do well on.
 Ideally, there would be some specific common workload traits such as high parallelism that cause issues for the duet.
 
-The last thing is statistical methods used to evaluate duet runs.
-Instead of filtering duet overlaps one could use all overlaps and weight them by the quality of an overlap.
-Other possibilities are in the area of hypothesis testing where there might be something better than the \mbox{u-test}.
+The last thing we mention is exploration of methods that would allow to determine the regression severity.
+Method of minimal detectable slowdown allows us to determine what kinds of slowdown can we reliably detect.
+However, in generic A/B run a slowdown is the unknown.

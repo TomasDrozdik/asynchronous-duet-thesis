@@ -36,20 +36,9 @@ One novel attribute of this tool is that it runs benchmarks in containers to ach
 Using the tool we run benchmarks from multiple benchmarking suites --- Renaissance, Scalabench, DaCapo, and SPEC CPU 2017.
 The first three are \mbox{JVM-based} while the last one represents natively compiled benchmarks.
 The goal of this thesis is to assess the viability of the asynchronous duet method for different benchmarks across different environments.
-Our choice of environments included bare-metal measurements on a dedicated server, AWS EC2 \lstinline{t3.medium} instance as cloud representative, and self-hosted shared virtual machine infrastructure.
+Our choice of environments includes \mbox{bare-metal} measurements on a dedicated server, AWS EC2 \lstinline{t3.medium} instances as cloud representative, and self-hosted shared virtual machine infrastructure.
 
-% What are the results? Did something improve?
-Results show that asynchronous duet performs very similarly to synchronous duet in terms of A/A detection accuracy.
-It is also able to achieve minimal detectable slowdowns (MDS)~\cite{laaber2019software} of $1\%$ for SPEC CPU benchmarks and $3-5\%$ for \mbox{JVM-based} benchmarks.
-Somewhat unexpectedly, our cloud measurements did not manifest variance much bigger than the \mbox{bare-metal} environment while the shared virtual machine environment came out as the most volatile.
-
-Another surprising result was the performance of the sequential method, which performed well when it comes to the overall variability of iteration scores with a coefficient of variability being lower for many benchmarks.
-However, the sequential method did not perform well in the statistical tests we chose for regression detection.
-
-That relates to arguably the biggest advantage of the duet methods which is its overall runtime reduction compared to sequential methods.
-Some benchmarks were able to finish in half the time using duet methods compared to sequential methods which directly translates to $50\%$ cost reduction.
-Although, the speedup was dependent on the environment.
-The cloud environment even experienced some slowdowns, likely due to fewer available CPUs.
+We examine sequential and duet method differences on overall runtime duration, measurement variability, A/A run detection accuracy and the factor of minimal detectable slowdowns (MDS)~\cite{laaber2019software}.
 
 % What can the reader expect in the individual chapters of the thesis?
 The thesis is structured as follows.
