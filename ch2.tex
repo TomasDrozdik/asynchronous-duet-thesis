@@ -2,20 +2,20 @@
 \label{chap:duet}
 
 Performance comparison of two different software versions is referred to as A/B benchmarking.
-For example, compiler authors want to test if their optimization improved performance of some benchmark, or a web developers want to test if a recent commit caused regression in their internal benchmark.
-In both cases the benchmark code is the same, and it runs with two slightly different workloads, versions A and B, that are similar in nature.
+For example, compiler authors want to test if their optimization improved the performance of some benchmark, or web developers want to try if a recent commit caused regression in their internal benchmark.
+In both cases, the benchmark code is the same, and it runs with two slightly different workloads, versions A and B, that are similar in nature.
 
-\Cref{fig:method_timeline} shows a comparison between three benchmarking methods analyzed in this thesis (1) sequential, (2) synchronous duet and (3) asynchronous duet.
-The sequential method is the simplest where each version is run independently of the other.
-Synchronous duet on the other hand runs A and B in parallel, and it has to synchronize the starts of individual iterations.
+\Cref{fig:method_timeline} shows a comparison between three benchmarking methods analyzed in this thesis (1) sequential, (2) synchronous duet, and (3) asynchronous duet.
+The sequential method is the simplest, where each version is run independently of the other.
+On the other hand, the synchronous duet runs A and B in parallel, and it has to synchronize the starts of individual iterations.
 Asynchronous duet runs in parallel as well but does not require synchronized iterations.
 
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=.9\linewidth]{./figures/method_timeline.pdf}
 	\caption{
-	Comparison of different benchmarking methods sequential, synchronous duet, and asynchronous duet when comparing 2 software versions A and B.
-	Benchmark runs 2 iterations with the same durations for all methods and versions.
+	Comparison of different benchmarking methods, sequential, synchronous duet, and asynchronous duet, when comparing two software versions, A and B.
+	Benchmark runs two iterations with the same durations for all methods and versions.
 	Note that version B introduced a regression where the first iteration takes twice as long.
 	The \mbox{x-axes} is an example timeline of measurements.
 	}
@@ -81,11 +81,11 @@ Therefore, it is natural that these additional steps create gaps between measure
 \end{algorithm}
 
 \Cref{fig:overlap_timeline} shows what implications can the absence of synchronization have on workload overlaps.
-With enough iterations, harness specifics, and potentially different A/B performance workloads will inevitably diverge.
+With enough iterations, harness specifics and potentially different A/B performance workloads will inevitably diverge.
 
-Even if workloads are partially overlapping, the start of a workload might do different things, for example, be CPU bound while the end of the workload might be I/O bound.
-Fair CPU scheduling should, in theory, allocate the same amount of processor time for both workloads essentially synchronizing them.
-However, in practice, due to the inherent variability of these systems workloads will diverge.
+Even if workloads are partially overlapping, the start of a workload might do different things, for example, be CPU bound while the end might be I/O bound.
+Fair CPU scheduling should, in theory, allocate the same amount of processor time for both workloads, essentially synchronizing them.
+However, in practice, due to the inherent variability of these systems, workloads will diverge.
 
 For example, \cref{fig:overlap_interference} demonstrates a case when this happens.
 Even workloads with the same performance might get to a state of equilibrium where parts of workloads with different bound nature overlap each other.
@@ -102,7 +102,7 @@ Therefore, our next research question examines the way duet pairs overlap.
 	\includegraphics[width=.9\linewidth]{./figures/overlap_timeline.pdf}
 	\caption{
 		Tailored examples of how lack of synchronization and time in between workload execution might affect duet overlap.
-		This is an example timeline of iterations of an \emph{asynchronous duet} measurement from an iteration $i$ and $j$ for versions $A$ and $B$ respectively.
+		This is an example timeline of iterations of an \emph{asynchronous duet} measurement from an iteration $i$ and $j$ for versions $A$ and $B$, respectively.
 		Focus on how versions $A$ and $B$ overlap --- just partially or even not at all.
 	}
 	\label{fig:overlap_timeline}
@@ -113,14 +113,14 @@ Therefore, our next research question examines the way duet pairs overlap.
 	\includegraphics[width=.9\linewidth]{./figures/overlap_interference.pdf}
 	\caption{
 		Tailored examples of how different nature of a workload might compromise the duet's impact symmetry.
-		Initially, $A$ and $B$ overlap on both CPU and I/O bound parts which slow down $B$ for the first 2 runs.
+		Initially, $A$ and $B$ overlap on both CPU and I/O bound parts, slowing down $B$ for the first two runs.
 		Then, CPU and I/O bound parts of $A$ and $B$ workloads overlap less end $B$ turns out to be as fast as $A$.
 		Notice that $A$ and $B$ enter a state of equilibrium where each is bound on different parts of the underlying hardware.
 	}
 	\label{fig:overlap_interference}
 \end{figure}
 
-For the asynchronous duet method to be useful runtime reduction and overlapping workloads are not enough.
+For the asynchronous duet method to be useful, runtime reduction and overlapping workloads are not enough.
 The asynchronous duet method has to show accuracy in regression detection on par with the synchronized duet method:
 
 % RQ3 Accuracy

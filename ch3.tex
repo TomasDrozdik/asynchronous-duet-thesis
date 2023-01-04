@@ -4,8 +4,8 @@
 We implemented a super-harness that takes an existing benchmark harness as an input and executes its benchmarks in the asynchronous duet style.
 
 % Running in docker and reasons for it
-To keep a configuration portable and the dependencies minimal we have decided to use the container technology, namely Docker~\cite{merkel2014docker} or Podman~\cite{podman}.
-Tool is named \lstinline{duetbench}, and it is part of open sourced python package \lstinline{duet}~\cite{duet} that also implements other complementary tools described in~\cref{sec:result_parsing}.
+To keep a configuration portable and dependencies minimal, we have decided to use the container technology, namely Docker~\cite{merkel2014docker} or Podman~\cite{podman}.
+The tool is named \lstinline{duetbench}, and it is part of open source python package \lstinline{duet}~\cite{duet} that also implements other complementary tools described in~\cref{sec:result_parsing}.
 Documentation is in the form of GitHub wiki~\cite{wiki}.
 
 We want to compare asynchronous duet with~\citet{bulej2020duet}, hence our super-harness supports synchronized duet and sequential method in a containerized environment.
@@ -31,8 +31,8 @@ For duet methods, one \emph{run} executes 2 benchmarks in parallel.
     \label{fig:duetbench_sequence}
 \end{figure}
 
-If there are more benchmarks to execute pick the next one (according to a particular scheduling strategy, see~\cref{sec:scheduling}) and do the same process.
-In the case of the sequential method, the process is very much the same just omit the second container entirely and run them separately.
+If there are more benchmarks to execute, pick the next one (according to a particular scheduling strategy, see~\cref{sec:scheduling}) and do the same process.
+In the case of the sequential method, the process is very much the same omit the second container entirely and run them separately.
 
 \subsection{Synchronized duet in containerized environment}
 \label{sec:sync_duet_impl}
@@ -40,8 +40,8 @@ In the case of the sequential method, the process is very much the same just omi
 \citet{bulej2020duet} uses a \mbox{shared-memory} barrier to synchronize benchmark iterations.
 We ported this solution into the containers to mimic the original behavior.
 
-The barrier uses the pthread API that is not available on all systems such as macOS.
-Therefore, \lstinline{duetbench} starts a third container to initialize, and later clean up the barrier, hence bypassing the missing functionality on the host system.
+The barrier uses the pthread API that is not available on all systems, such as macOS.
+Therefore, \lstinline{duetbench} starts a third container to initialize and later clean up the barrier, hence bypassing the missing functionality on the host system.
 
 Docker environments are separated by design.
 To facilitate this feature \lstinline{duetbench} mounts host directory \lstinline{-v /dev/shm:/dev/shm} and shares \mbox{inter-process} communication namespace \lstinline{--ipc host}\footnote{\url{https://docs.docker.com/engine/reference/run/}}.
@@ -61,10 +61,10 @@ To facilitate this feature \lstinline{duetbench} mounts host directory \lstinlin
 \label{sec:configuration}
 
 \Cref{lst:config} shows section of \lstinline{duetbench} YAML configuration file that describes an A/B asynchronous duet and sequential run.
-The goal of the design was to make configuration generic and simple to use so that many harnesses and benchmark suites can be adapted to use with \lstinline{duetbench}.
-Full documentation of the \lstinline{duetbench} configuration including a description of how to run synchronized duets (not present in the~\cref{lst:config}) is on the wiki~\cite{wiki}.
+The goal of the design was to make configuration generic and straightforward to use so that many harnesses and benchmark suites can be adapted to use with \lstinline{duetbench}.
+Complete documentation of the \lstinline{duetbench} configuration, including a description of how to run synchronized duets (not present in the~\cref{lst:config}) is on the wiki~\cite{wiki}.
 
-Freedom in run command allows for tweaking of the harness to better suit asynchronous duet.
+Freedom in run command allows tweaking the harness to suit the asynchronous duet better.
 For example, some harnesses support skips of validation or various garbage collector options.
 Detailed configuration of experiments is in~\cref{sec:experiment_setup}.
 
@@ -119,9 +119,9 @@ The minimal schema of a result data point looks like this:
         \end{itemize}
 \end{itemize}
 
-Since different benchmark suites have widely different results formats users have to write a parser plugin --- python function.
-The parser has to obtain iteration start and end absolute timestamps from benchmark results. 
-Additionally, since users need to write a parser for a given benchmark suite, they might add any sort of data that the benchmark produces as an addition to the above-mentioned schema.
+Since different benchmark suites have widely different results formats, users have to write a parser plugin --- python function.
+The parser must obtain iteration start and end absolute timestamps from benchmark results. 
+Additionally, since users need to write a parser for a given benchmark suite, they might add any data that the benchmark produces as an addition to the schema mentioned above.
 
 Some benchmark suites don't track absolute timestamps of iterations and thus need some modification.
 However, without absolute timestamps, one could not evaluate how iterations overlap (\emph{RQ2}).
@@ -129,7 +129,7 @@ However, without absolute timestamps, one could not evaluate how iterations over
 \subsection{Notation}
 \label{sec:notation}
 
-To describe parsed results more formally and describe terminology from the \lstinline{duet} package we use the following terms:
+To describe parsed results more formally and describe terminology from the \lstinline{duet} package, we use the following terms:
 
 \begin{description}
     \item[Environment] $e \in E$ classifies host hardware and software configuration --- where \lstinline{duetbench} runs.
@@ -139,7 +139,7 @@ To describe parsed results more formally and describe terminology from the \lsti
     \item[Pair] $p \in P$ is version of tested software in case of A/B runs $P = \{A, B\}$
     \item[Benchmark] $b \in B$ is a benchmark from a benchmark suite, formally $B = \{(suite, benchmark)~|~benchmark \in suite \}$
     \item[Run] in environment $e \in E$ of type $t \in T$ running benchmark $b \in B$ and pair $p \in P$ is denoted as $R^{e, t, b, p}$.
-        It is a unit that \lstinline{duetbench} works with and can run multiple times.
+        It is a unit with which \lstinline{duetbench} works and can run multiple times.
     \item[Iterations] of a run $R^{e, t, b, p}$ with $iters$ iterations is an ordered set $(i_1, i_2, \dots i_{iters})$ of scores of particular benchmark --- execution time in nanoseconds.
 \end{description}
 
@@ -148,7 +148,7 @@ To distinguish different measurement methods for some benchmark $b \in B$ in an 
 M^{e, b}_{seqn} &= \{(R^{e, seqn, b, A}_r,~R^{e, seqn, b, B}_r)~|~\forall r \in \{1 \dots runs\}\},
 \end{align*}
 
-set of all synchronized duet measurements which are naturally paired on the level of pairs and iterations as
+set of all synchronized duet measurements, which are naturally paired on the level of pairs and iterations as
 \begin{align*}
 M^{e, b}_{sduet} &= \{(R^{e, sduet, b, A}_r,~R^{e, sduet, b, B}_r)~|~\forall r \in \{1 \dots runs\}\}\\
                  &= \{(i^A_j,~i^B_j)_r~|~\forall r \in \{1 \dots runs\},~\forall j \in \{1 \dots iters\}\},
@@ -169,10 +169,10 @@ $$
 \subsection{Overlaps}
 \label{sec:overlaps}
 
-To address \emph{RQ2} \lstinline{duetprocess} provides a method to compute overlaps of iterations of a given asynchronous duet run.
+To address \emph{RQ2} \lstinline{duetprocess} provides a method to compute overlapping iterations of a given asynchronous duet run.
 Let $(R^A, R^B) \in M^{e, b}_{aduet}$.
 Iterations of respective runs are $R^A = (i^A_1 \dots i^A_{iters})$ and $R^B = (i^B_1 \dots i^B_{iters})$.
-To define iteration overlaps the following notation is used:
+Iteration overlap definition uses the following notation:
 \begin{align*}
 start(i) &= \text{start of iteration } i,\\
 end(i) &= \text{end of iteration } i,\\

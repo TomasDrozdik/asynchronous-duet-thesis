@@ -3,19 +3,19 @@
 % What is the nature of the problem the thesis is addressing?
 Modern software development with rapid development cycles is in dire need of a~fast, accessible, scalable, and reliable performance regression detection method.
 A typical question is if neighboring commits of the same software manifest regression.
-For instance, authors of a compiler might be concerned if a new optimization increased the performance of a particular benchmark.
+For instance, authors of a compiler might be concerned if a new optimization increases the performance of a particular benchmark.
 
 % What is the common approach for solving that problem now?
-The traditional method of performance measurement relies on a dedicated bare-metal server with an isolated and carefully set up environment that tries to prevent measurement noise.
-This method is reasonably fast and reliable but lacks accessibility and scalability requirements as the cost of maintenance is high.
+The traditional performance measurement method relies on a dedicated bare-metal server with an isolated and carefully set environment that tries to prevent measurement noise.
+This method is reasonably fast and reliable but lacks accessibility and scalability requirements as the maintenance cost is high.
 
-To address the scalability and accessibility much research over the past decade has focused on offloading performance measurements to the cloud~\cite{leitner2016patterns, laaber2019software, abedi2017conducting}.
+To address the scalability and accessibility, research over the past decade has focused on offloading performance measurements to the cloud~\cite{leitner2016patterns, laaber2019software, abedi2017conducting}.
 Cloud offers scalable \mbox{on-demand} infrastructure with pay for what you use principle.
 However, this research has shown that performance measurement in the cloud is difficult because of the high variability of the shared infrastructure environment.
 
 Even in ideally crafted \mbox{bare-metal} conditions, multiple measurements are necessary to deal with the inherent variability introduced by the code running platform, such as \mbox{just-in-time} compilation, garbage collection, memory mapping, and CPU frequency scaling.
 Benchmark code itself can have its share of non-determinism that contributes to the overall variability of the measurements.
-Hence, in addition to benchmark harness running its workload in a loop practitioners often run the benchmark multiple times.
+Hence, in addition to benchmark harness running its workload in a loop, practitioners often run the benchmark multiple times.
 Afterward, analyze individual iteration scores to evaluate the final score.
 
 In the context of compiler programmers, they may run multiple benchmarks on a version with and without the optimization and compare the final scores.
@@ -23,7 +23,8 @@ We refer to this method as \emph{sequential benchmarking} as it runs different v
 
 \citet{bulej2020duet} introduced a new benchmarking method called \emph{duet benchmarking} designed with volatile environments such as the cloud in mind.
 The main idea of duet benchmarking is to run both versions in parallel.
-The distinguishing property of this method is that it does not try to prevent interference, on the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
+The distinguishing property of this method is that it does not try to prevent interference.
+On the contrary, duet benchmarking acknowledges the presence of variability and relies on fair scheduling to make the impact equal on both versions running in parallel.
 Afterward, the benchmark scores are statistically evaluated to determine if there is a performance regression between the two versions.
 The duet benchmarking method has shown improvement ranging from $5.03 \times$ on average for Scalabench and DaCapo workloads to $37.4 \times$ on average for SPEC CPU 2017 workloads~\cite{bulej2020duet}.
 However, this method relies on synchronized iterations of a~benchmark, which requires benchmark harness modification that synchronizes individual iterations between harnesses.
@@ -33,17 +34,17 @@ This thesis explores the relaxation of this synchronization requirement which cr
 To achieve this, we implement a tool for running benchmarks that supports sequential, synchronous, and asynchronous duet methods.
 One novel attribute of this tool is that it runs benchmarks in containers to achieve portability and ease of setup.
 
-Using the tool we run benchmarks from multiple benchmarking suites --- Renaissance, Scalabench, DaCapo, and SPEC CPU 2017.
+Using the tool, we run benchmarks from multiple benchmarking suites --- Renaissance, Scalabench, DaCapo, and SPEC CPU 2017.
 The first three are \mbox{JVM-based} while the last one represents natively compiled benchmarks.
 The goal of this thesis is to assess the viability of the asynchronous duet method for different benchmarks across different environments.
 Our choice of environments includes \mbox{bare-metal} measurements on a dedicated server, AWS EC2 \lstinline{t3.medium} instances as cloud representative, and self-hosted shared virtual machine infrastructure.
 
-We examine sequential and duet method differences on overall runtime duration, measurement variability, A/A run detection accuracy and the factor of minimal detectable slowdowns (MDS)~\cite{laaber2019software}.
+We examine sequential and duet method differences on overall runtime duration, measurement variability, A/A run detection accuracy, and the factor of minimal detectable slowdowns (MDS)~\cite{laaber2019software}.
 
 % What can the reader expect in the individual chapters of the thesis?
 The thesis is structured as follows.
 The first chapter provides some background on benchmarking in volatile environments.
-The second chapter delves into duet benchmarking and poses research questions for this thesis with the goals summarized at the end of this chapter.
+The second chapter delves into duet benchmarking and poses research questions for this thesis, with the goals summarized at the end of this chapter.
 The third chapter describes the architecture of our benchmark automation tool capable of running benchmarks from multiple suites using both sequential and duet methods.
 The fourth chapter summarizes the statistical methods used to evaluate regressions which are later used in the fifth chapter that presents the results.
 Finally, we conclude the thesis and lay out the possibilities for future work in this area.

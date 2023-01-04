@@ -1,18 +1,18 @@
 \chapter{Overview of Results Processing}
 \label{chap:results}
 
-With multiple repetitions and inherent variance of measurements statistical analysis is used to determine performance regression in an A/B run.
-This chapter describes statistical methods we use to determine and compare measurement variance and regression detection of an A/B run using different benchmarking methods.
-In particular, it adjusts the confidence interval test from \citet{bulej2020duet} to work with asynchronous duet.
+With multiple repetitions and inherent variance of measurements, statistical analysis is used to determine performance regression in an A/B run.
+This chapter describes the statistical methods used to determine and compare measurement variance and regression detection of an A/B run using different benchmarking methods.
+In particular, it adjusts the confidence interval test from \citet{bulej2020duet} to work with the asynchronous duet.
 
 \section{A/A runs}
 
-Finding a software project that exhibits certain slowdown is difficult since regression is often tied to the hardware running the benchmark.
+Finding a software project that exhibits a certain slowdown is difficult since regression is often tied to the hardware running the benchmark.
 Instead, research into performance measurements employs A/A measurement technique~\cite[laaber2019software, bulej2020duet].
-A/A measurement runs the same version and later labels runs with A and B labels --- as if there were 2 different versions.
-Since the code is the same the performance should be the same as well.
-Usability of a benchmarking method can thus be a result of its ability to correctly detect A/A measurements correctly.
-In the context of duet runs A/B labeling is performed on concurrently running duet pairs.
+A/A measurement runs the same version, and later labels run with A and B labels --- as if there were two different versions.
+Since the code is the same, the performance should be the same as well.
+The usability of a benchmarking method can thus be a result of its ability to detect A/A measurements correctly.
+In the context of duet runs, A/B labeling is performed on concurrently running duet pairs.
 
 \section{Data filtering}
 \label{sec:data_filtering}
@@ -22,10 +22,10 @@ We kept all measurements of SPEC CPU benchmarks since it is natively compiled.
 
 \section{Accuracy analysis and performance regression tests}
 
-To address the variance of different benchmarking methods, using containers, across different environments (\emph{RQ3}), we use various statistical methods.
-First we compare the raw variance of measurements after data filtering using relative standard deviation.
-Then we compute the confidence intervals of paired iteration score difference similar to \citet{bulej2020duet}, but it has to be adjusted for asynchronous duet.
-That is basis for the confidence interval test, and it allows us to compare the relative confidence interval width across different methods.
+We use various statistical methods to address the variance of different benchmarking methods, running benchmarks in containers across different environments (\emph{RQ3}).
+First, we compare the raw variance of measurements after data filtering using relative standard deviation.
+Then we compute the confidence intervals of paired iteration score difference similar to \citet{bulej2020duet}, but it has to be adjusted for the asynchronous duet.
+That is the basis for the confidence interval test, and it allows us to compare the relative confidence interval width across different methods.
 Another regression detection method is \mbox{Mann-Whitney} \mbox{u-test} that compares iteration score distributions between pairs.
 Last we use both regression tests to explore the minimal detectable slowdowns~\cite{laaber2019software} of sequential and duet methods.
 
@@ -38,8 +38,8 @@ For measurement type $t \in T$, benchmark $b \in B$, runs $R^{t, b} \in M^e$:
 CV^{t, b} &= \frac{std(R^{t, b})}{mean(R^{t, b})}.
 \end{align*}
 
-The $CV$ is a measure of how the results of different benchmarks vary relative to each other using different benchmarking methods.
-However, the variance of duet methods cannot be determined just based on $CV$.
+The $CV$ measures how the results of different benchmarks vary relative to each other using different benchmarking methods.
+However, the variance of duet methods cannot be determined based on $CV$.
 
 For instance, higher $CV$ for given benchmark duet measurements compared to its sequential measurements doesn't imply worse predictability of duet methods because of the impact symmetry argument.
 Overall variance might be higher, but the pairwise comparison could be more telling.
@@ -48,8 +48,8 @@ On the other hand, lower $CV$ for duet methods suggests better robustness of due
 \subsection{Confidence interval test}
 \label{sec:ci_test}
 
-To determine if pairs manifest performance change use the method of confidence intervals from~\citet{bulej2020duet}.
-This method also provides a variance comparison across benchmarking methods based on relative confidence interval width.
+To determine if pairs manifest performance change, use the method of confidence intervals from~\citet{bulej2020duet}.
+This method also compares variance across benchmarking methods based on relative confidence interval width.
 Here, we describe the method and extend its use for the asynchronous duet.
 
 First, runs and their iterations need to be paired.
@@ -58,7 +58,7 @@ First, runs and their iterations need to be paired.
         $$
         is\_pair(i^A_i, i^B_j) = True \Longleftrightarrow i = j.
         $$
-    \item[Synchronous duet] runs are naturally paired - sequentially by iterations, thus they have the same $is\_pair$ predicate.
+    \item[Synchronous duet] runs are naturally paired - sequentially by iterations; thus they have the same $is\_pair$ predicate.
     \item[Asynchronous duet] runs can't be paired sequentially.
         Considering A/B measurements, non-synchronized iterations will inevitably diverge, hence sequential iteration pairing wouldn't support impact symmetry.
         Instead, we decided to pair iterations $i^A$ and $i^B$ based on the minimum overlap ratio $m \in (0, 1)$ and thus define a set of filtered overlaps as
@@ -83,18 +83,18 @@ $$
 X = \{i^A - i^B~|~(i^A, i^B)~\in~Pairs(M^{e, b}_t)\}.
 $$
 
-Furthermore, \citet{bulej2017stat} recommend to use \emph{run means} sampling instead of \emph{runs merged} sampling.
+Furthermore, \citet{bulej2017stat} recommend using \emph{run means} sampling instead of \emph{runs merged} sampling.
 The runs merged method uses all paired iterations from all runs as a sample.
-Run means, on the other hand, aggregates paired iterations in a paired run using statistical methods, for example, arithmetic mean and uses those as samples.
+On the other hand, run means aggregates paired iterations in a paired run using statistical methods such as arithmetic mean and uses those as samples.
 Given $r$ runs each with $i$ iterations \emph{runs merged} results in $r * i$ observations and \emph{run means} results in $r$ observations.
 
-We decided to use \emph{run means} sampling because we have the same amount of runs for each benchmark but not identical iteration count across suites.
+We decided to use \emph{run means} sampling because we have the same amount of runs for each benchmark but not identical iteration counts across suites.
 
 These observations are used to create $95\%$ confidence interval using non-parametric bootstrap with $9999$ draws with replacement and arithmetic mean as statistics.\footnote{We used the bootstrap method from python \lstinline{scipy} package \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html} that uses a \mbox{bias-corrected} and accelerated method to compute the CI by default.}
-For A/A runs we expect distribution $F_X$ to be centered around~$0$.
+For A/A runs, we expect distribution $F_X$ to be centered around~$0$.
 Therefore, if the confidence interval encompasses~$0$, we consider the workloads equal, otherwise report a difference.
 
-The confidence computation in~\citet{bulej2020duet} differs for synchronous duet because it uses difference of paired iteration durations together with arithmetic mean instead of iteration duration ratio with geometric mean.
+The confidence computation in~\citet{bulej2020duet} differs for synchronous duet because it uses the difference of paired iteration durations together with arithmetic mean instead of iteration duration ratio with geometric mean.
 This change simplifies the comparison process because the samples of different benchmarking methods have the same units.
  
 \subsubsection{Variability comparison using CI}
@@ -109,11 +109,11 @@ CI_{relative\_width}(X) = \frac{CI_{width}(X)}{mean(X)}.
 \label{sec:utest}
 
 The next method to evaluate regression in an A/B run is to use hypothesis testing.
-One such test used for purpose of A/B performance evaluation is Mann-Whitney \mbox{u-test}~\cite{bulej2017stat,laaber2019software}.
+One such test used for the purpose of A/B performance evaluation is Mann-Whitney \mbox{u-test}~\cite{bulej2017stat,laaber2019software}.
 It is a non-parametric test of the null hypothesis that two samples come from the same distribution.
-One sample is the iteration durations of pair A and the other is of pair B.
+One sample is the iteration durations of pair A, and the other is of pair B.
 
-We used \mbox{u-test} implementation from \lstinline{scipy} python package~\footnote{\url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html}} in its \mbox{two-sided} variant and decide to reject the null hypothesis if \mbox{p-value} is less than $5\%$.
+We used \mbox{u-test} implementation from \lstinline{scipy} python package~\footnote{\url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html}} in its \mbox{two-sided} variant and decided to reject the null hypothesis if \mbox{p-value} is less than $5\%$.
 Hence, if \mbox{p-value} is below $5\%$ for a given benchmark, test method, and environment reject the null hypothesis --- sample distributions are distinct enough, thus we report a performance change.
 
 \section{Minimal detectable slowdown}
@@ -128,7 +128,7 @@ Formally we adjust the experiment $M^{e}$ as
 $$
 M^{e}_{slowed} = \{(R^A, {i^B * s~|~\forall i^B \ in R^B})~|~\forall (R^A, R^B) \in M^{e}\}.
 $$
-Increased iteration times of pair B affect the overlap of A and B during asynchronous duet.
-Therefore, recompute the start and end timestamps of each B's iteration, assuming the gaps between iterations remain unchanged.
+Increased iteration times of pair B affect the overlap of A and B during the asynchronous duet.
+Therefore, recompute each B's iteration's start and end timestamps, assuming the gaps between iterations remain unchanged.
 
 Then the altered results can be compared as if they were A/B runs using the confidence interval test or \mbox{Mann-Whitney} \mbox{u-test} while the slowdown is known.

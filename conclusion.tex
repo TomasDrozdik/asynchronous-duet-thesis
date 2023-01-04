@@ -7,62 +7,63 @@ In particular, we wanted to answer questions from~\cref{sec:goals}.
 %% Accessibility
 First of which was better accessibility of duet methods.
 We achieved that by creating a benchmark super-harness tool that can run benchmarks from multiple suites in a portable containerized way using both sequential and duet methods.
-This tool was used to run measurements in cloud, bare-metal and shared virtual machine environments.
+This tool was used to run measurements in cloud, bare-metal, and shared virtual machine environments.
 
 %% Runtime and cost reduction
 The second goal focused on the runtime reduction potential of duet methods.
 \Cref{sec:rq1} shows that most of the natively compiled and longer running benchmarks from SPEC CPU suite ran $80 - 100\%$ faster when using the asynchronous duet method compared to using the sequential method reducing the costs by up to $50\%$.
 However, results varied across benchmark suites and environments.
-Cloud environment in particular did not do well in runtime speedups and even manifested a slowdown for some benchmarks.
-Although this was likely caused by cloud instances having 2 vCPUs while other environments had 4.
-Overall average speedups were $8\%$, $60\%$ and $54\%$ for cloud, \mbox{bare-metal} and \mbox{shared-VM} environments respectively.
+Cloud environment, in particular, did not do well in runtime speedups and even manifested a slowdown for some benchmarks.
+Although this was likely caused by cloud instances having two vCPUs while other environments had 4.
+Overall average speedups were $8\%$, $60\%$, and $54\%$ for cloud, \mbox{bare-metal} and \mbox{shared-VM} environments respectively.
 
 % Accuracy
 The third and last goal focused on the accuracy of the asynchronous duet method.
-Initially, we looked at the way asynchronous iterations overlap in~\cref{sec:rq2}.
+Initially, we looked at how asynchronous iterations overlap in~\cref{sec:rq2}.
 Overlap quality was determined by the proportion of overlap duration and time of overlapping iterations being above a certain threshold --- minimum overlap ratio.
 It turned out that SPEC CPU benchmarks overlapped almost all the time as if the iterations were synchronized.
 \mbox{JVM-based} suites with shorter and more variable benchmarks create overlaps of various sizes.
 
 \Cref{sec:rq3} looked at iteration variability of different methods and A/A run detection capabilities.
 The overall variability of the benchmark scores across different environments was captured by the coefficient of variability and the relative width of confidence intervals from the confidence intervals test.
-The coefficient of variability turned out to be below $0.2$ for almost all tested benchmarks in all environments with SPEC CPU being the least variable as expected.
+The coefficient of variability turned out to be below $0.2$ for almost all tested benchmarks in all environments, with SPEC CPU being the least variable, as expected.
 We did not observe any significant difference between cloud and \mbox{bare metal}.
-However, the width of confidence intervals differentiates the shared virtual machine environment as the most volatile with the sequential method having the biggest variability.
+However, the width of confidence intervals differentiates the shared virtual machine environment as the most volatile, with the sequential method having the most extensive variability.
 Again the cloud and \mbox{bare-metal} environments look very similar when compared by confidence interval width.
 
 A/A detection accuracy used an adjusted confidence interval test and \mbox{u-test}.
 The confidence interval test for an asynchronous duet was parametrized by the minimum overlap ratio pairing of $40\%$ based on empirical observations.
 The confidence interval test was able to successfully detect $90\%$ of all \mbox{JVM-based} benchmarks and $80\%$ of SPEC CPU benchmarks.
 The relatively low success rate of detecting SPEC CPU A/A runs is likely due to its low variability hence relatively low confidence interval width that might not include point $0$.
-To accommodate for this the confidence interval test can be extended to consider the error by which the confidence interval missed $0$ and account for some leeway.
+To accommodate this, the confidence interval test can be extended to consider the error by which the confidence interval missed $0$ and account for some leeway.
 
-\mbox{Mann-Whitney} \mbox{u-test} was much more sensitive to difference hence it has much worse A/A accuracy overall with only $62\%$ correctly detected \mbox{JVM-based} benchmarks.
+\mbox{Mann-Whitney} \mbox{u-test} was much more sensitive to difference; hence it has much worse A/A accuracy overall with only $62\%$ correctly detected \mbox{JVM-based} benchmarks.
 However, the sensitivity proved useful for SPEC CPU benchmarks which had $100\%$ A/A detection in the cloud environment and $84\%$ in \mbox{bare-metal}.
 Method comparison with \mbox{u-test} rules asynchronous duet as the best with $74\%$ followed by the synchronous duet with $65\%$ and sequential with $60\%$ A/A detection accuracy.
 
-Last, we examined the factor of minimum detectable slowdowns (MDS) using artificially slowed down A/A runs in~\cref{sec:rq4}.
-Duet methods outperformed sequential method with the ability to detect $3-5\%$ slowdown for \mbox{JVM-based} benchmarks and even $1\%$ regression for SPEC CPU benchmarks while the sequential methods had issues detecting even $10\%$ regression in our shared virtual machine environment but the results were similar in the cloud and bare-metal environments.
+Last, we examined the minimum detectable slowdowns (MDS) factor using artificially slowed down A/A runs in~\cref{sec:rq4}.
+Duet methods outperformed sequential method with the ability to detect $3-5\%$ slowdown for \mbox{JVM-based} benchmarks and even $1\%$ regression for SPEC CPU benchmarks, while the sequential method had issues detecting even $10\%$ regressions in our shared virtual machine environment.
+However, the results were similar in the cloud and bare-metal environments.
 
 % Does the result have any practical applications that improve upon something realistic?
 Overall, removing the synchronization requirement does not hurt synchronous duet accuracy improvements.
-With possibilities for significant runtime and cost reduction while keeping high regression detection capabilities we believe that the asynchronous duet method is an attractive novel benchmarking approach usable even in variable environments.
+With possibilities for significant runtime and cost reduction while maintaining high regression detection capabilities, we believe the asynchronous duet method is an attractive novel benchmarking approach that is usable even in variable environments.
 Additionally, the \lstinline{duet} python package provides a generic way of running and processing benchmarks in the containerized environment using sequential and duet methods.
 
 % What is the quality of the result? Is the problem solved for good and the mankind does not need to ever think about it again, or just partially improved upon? (Is the incompleteness caused by overwhelming problem complexity that would be out of thesis scope\todo{This is quite common.}, or any theoretical reasons, such as computational hardness?)
 \section*{Future work}
 One thing we did not manage to include in this thesis due to restricted resources is broader coverage of cloud providers and instance types with higher CPU count in particular.
 This could prove that runtime and cost reductions in the cloud are similar to what we observed in our shared virtual machine infrastructure.
-More measurements could also examine what is the required amount of runs to achieve some reasonable level of accuracy.
-In our experiments, we used 20 runs per benchmark but fewer runs may be sufficient to detect a certain level of MDS.
+More measurements could also examine the required number of runs to achieve reasonable accuracy.
+In our experiments, we used 20 runs per benchmark, but fewer runs may be sufficient to detect a certain level of MDS.
 
 We did not examine the synchronized interference of benchmarks in depth.
-This interference can manifest predominantly in the asynchronous duet method as shown in~\cref{fig:overlap_interference}.
+This interference can manifest predominantly in the asynchronous duet method, as shown in~\cref{fig:overlap_interference}.
 One would need to look closer at benchmark workloads and their bottlenecks to see if workloads with different bottlenecks interfere in some synchronous manner while running in a duet.
 
-Another thing that needs a closer look at individual benchmarks is an analysis of benchmarks that the duet did not do well on.
-Ideally, there would be some specific common workload traits such as high parallelism that cause issues for the duet.
+Another thing that needs a closer look at individual benchmarks is an analysis of benchmarks on which the duet did not do well.
+Ideally, some specific common workload traits, such as high parallelism, would cause issues for the duet.
 
-The last thing we mention is exploration of methods that would allow to determine the regression severity.
-Method of minimal detectable slowdown allows us to determine what kinds of slowdown can we reliably detect.
-However, in generic A/B run a slowdown is the unknown.
+The last thing we mention is an exploration of methods that would allow determining the regression severity.
+The method of minimal detectable slowdown allows us to determine what slowdowns we can reliably detect.
+However, in a generic A/B run, a slowdown is unknown.
