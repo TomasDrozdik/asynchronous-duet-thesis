@@ -71,11 +71,12 @@ This tool can run benchmarks with sequential and both duet methods utilizing con
 \def\AbstractCS{
 Přesná detekce zpomalení benchmarků v nestabilních prostředích, jako je veřejný cloud, je obtížná.
 Cloud nabízí dostupnou a škálovatelnou infrastrukturu pro spouštění benchmarků, ale tradiční metody benchmarkingu často nezvládají spolehlivě rozpoznat zpomalení.
-Metoda duet bere variabilitu na vědomí a běží benchmarky paralelně za předpokladu podobné vnější symetrie dopadu.
-Tato práce zkoumá variantu metody duet, která nesynchronizuje iterace, což umožňuje širší využití této metody.
-Metoda asynchronního duetu dokáže detekovat zpomalení v rozsahu $1 - 5\%$ u většiny testovaných benchmarků ve volatilních prostředích a zároveň snižuje celkové náklady až o $50\%$.
+Metoda duetového měření s variabilitou počítá a s předpokladem podobných vnějších vlivů spouští benchmarky paralelně.
+Tato práce zkoumá variantu metody duet, která nevyžaduje synchronizaci iterací, což zjednodušuje nasazení do praxe.
+Metoda asynchronního duetu dokáže detekovat zpomalení v rozsahu $1 - 5\%$ u většiny testovaných benchmarků v nestabilních prostředích a zároveň snižuje celkové náklady až o $50\%$.
 Měření byla získána nástrojem pro automatizované spouštění a zpracování benchmarků z více sad.
-Tento nástroj může spouštět jak sekvenční metodu tak obě duet metody využívající kontejnery pro přenositelnost.
+Nástroj je postaven nad kontejnery pro lepší přenositelnost.
+Může pak spouštět jak obvyklou sekvenční metodu, původní duetové měření tak i rozšíření pro nesynchronizované běhy.
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces.
